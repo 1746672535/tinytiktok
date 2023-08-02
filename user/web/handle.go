@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"tinytiktok/utils/consul"
+	"tinytiktok/utils/jwt"
 )
 
 var reg *consul.Registry
@@ -14,6 +15,9 @@ func init() {
 // TODO
 func main() {
 	router := gin.Default()
-	router.POST("/douyin/user/register/", registerUser)
+	router.Use(jwt.JwtAuth())
+	router.POST("/douyin/user/register/", userRegister)
+	router.POST("/douyin/user/login/", userLogin)
+	router.GET("/douyin/user/", userInfo)
 	router.Run(":5051")
 }

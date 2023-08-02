@@ -7,26 +7,27 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"net/http"
-	"tinytiktok/user/proto/register"
+	"tinytiktok/user/proto/login"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/jwt"
 )
 
-func registerSrv(md metadata.MD, username, password string) (rsp *register.RegisterResponse, err error) {
+func loginSrv(md metadata.MD, username, password string) (rsp *login.LoginResponse, err error) {
+	// TODO 请提取为公共方法
 	service, _ := reg.FindService("user-srv")
 	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", service.Address, service.Port), grpc.WithInsecure())
 	defer conn.Close()
 	// 获取client
 	client := server.NewUserServiceClient(conn)
 	// 发送请求
-	rsp, _ = client.Register(metadata.NewOutgoingContext(context.Background(), md), &register.RegisterRequest{
+	rsp, _ = client.Login(metadata.NewOutgoingContext(context.Background(), md), &login.LoginRequest{
 		Username: username,
 		Password: password,
 	})
 	return rsp, err
 }
 
-func userRegister(ctx *gin.Context) {
+func userLogin(ctx *gin.Context) {
 	username := ctx.DefaultQuery("username", "")
 	password := ctx.DefaultQuery("password", "")
 	// 一些数据
@@ -35,7 +36,7 @@ func userRegister(ctx *gin.Context) {
 		"name-bin", "有点心急",
 	)
 	// 向srv层发送请求
-	rsp, _ := registerSrv(md, username, password)
+	rsp, _ := loginSrv(md, username, password)
 	rsp.Token, _ = jwt.CreateToken(&jwt.UserClaims{
 		ID:   rsp.UserId,
 		Name: username,
