@@ -19,3 +19,4 @@ config/config.yaml
 .idea/vcs.xml
 .idea/tinytiktok.iml
 .idea/modules.xml
+/config/

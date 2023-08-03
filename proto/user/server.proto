@@ -1,9 +1,9 @@
 syntax = "proto3";
 package userServer;
 option go_package = "tinytiktok/user/proto/server";
-import "register.proto";
-import "login.proto";
-import "info.proto";
+import "user/register.proto";
+import "user/login.proto";
+import "user/info.proto";
 
 service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}

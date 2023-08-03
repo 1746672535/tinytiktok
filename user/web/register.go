@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"context"
@@ -9,11 +9,12 @@ import (
 	"net/http"
 	"tinytiktok/user/proto/register"
 	"tinytiktok/user/proto/server"
+	"tinytiktok/utils/consul"
 	"tinytiktok/utils/jwt"
 )
 
 func registerSrv(md metadata.MD, username, password string) (rsp *register.RegisterResponse, err error) {
-	service, _ := reg.FindService("user-srv")
+	service, _ := consul.Reg.FindService("user-srv")
 	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", service.Address, service.Port), grpc.WithInsecure())
 	defer conn.Close()
 	// 获取client
@@ -26,7 +27,7 @@ func registerSrv(md metadata.MD, username, password string) (rsp *register.Regis
 	return rsp, err
 }
 
-func userRegister(ctx *gin.Context) {
+func UserRegister(ctx *gin.Context) {
 	username := ctx.DefaultQuery("username", "")
 	password := ctx.DefaultQuery("password", "")
 	// 一些数据

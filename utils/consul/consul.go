@@ -9,6 +9,12 @@ import (
 	"syscall"
 )
 
+var Reg *Registry
+
+func init() {
+	Reg = NewRegistry("127.0.0.1", 8500)
+}
+
 type HealthCheck struct {
 	// 注意Consul是在docker里面运行, 指定本机地址
 	TCP                            string

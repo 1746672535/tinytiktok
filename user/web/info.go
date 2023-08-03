@@ -1,4 +1,4 @@
-package main
+package web
 
 import (
 	"context"
@@ -10,11 +10,12 @@ import (
 	"strconv"
 	"tinytiktok/user/proto/info2"
 	"tinytiktok/user/proto/server"
+	"tinytiktok/utils/consul"
 )
 
 func infoSrv(md metadata.MD, userId int64) (rsp *info2.UserResponse, err error) {
 	// TODO 请提取为公共方法
-	service, _ := reg.FindService("user-srv")
+	service, _ := consul.Reg.FindService("user-srv")
 	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", service.Address, service.Port), grpc.WithInsecure())
 	defer conn.Close()
 	// 获取client
@@ -26,7 +27,7 @@ func infoSrv(md metadata.MD, userId int64) (rsp *info2.UserResponse, err error) 
 	return rsp, err
 }
 
-func userInfo(ctx *gin.Context) {
+func UserInfo(ctx *gin.Context) {
 	// 需要验证jwt是否通过
 	auth, exist := ctx.Get("auth")
 	msg, _ := ctx.Get("msg")
