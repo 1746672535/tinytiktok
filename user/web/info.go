@@ -13,7 +13,7 @@ import (
 	"tinytiktok/utils/consul"
 )
 
-func infoSrv(md metadata.MD, userId int64) (rsp *info2.UserResponse, err error) {
+func InfoSrv(md metadata.MD, userId int64) (rsp *info2.UserResponse, err error) {
 	// TODO 请提取为公共方法
 	service, _ := consul.Reg.FindService("user-srv")
 	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", service.Address, service.Port), grpc.WithInsecure())
@@ -49,7 +49,7 @@ func UserInfo(ctx *gin.Context) {
 		"name-bin", "有点心急",
 	)
 	// 向srv层发送请求
-	rsp, _ := infoSrv(md, int64(userId))
+	rsp, _ := InfoSrv(md, int64(userId))
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": rsp.StatusCode,
 		"status_msg":  rsp.StatusMsg,

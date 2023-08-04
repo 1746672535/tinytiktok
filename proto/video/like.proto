@@ -1,0 +1,16 @@
+syntax = "proto3";
+package like;
+option go_package = "tinytiktok/video/proto/like";
+
+
+message LikeRequest {
+  string token = 1; // 用户鉴权token
+  int64 user_id = 2; // 用户id
+  int64 video_id = 3; // 视频id
+  int32 action_type = 4; // 1-点赞，2-取消点赞
+}
+
+message LikeResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}

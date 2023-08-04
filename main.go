@@ -10,12 +10,13 @@ import (
 // TODO
 func main() {
 	router := gin.Default()
-	router.Use(jwt.JwtAuth())
+	router.Use(jwt.Auth())
 	// User
 	router.POST("/douyin/user/register/", userWeb.UserRegister)
 	router.POST("/douyin/user/login/", userWeb.UserLogin)
 	router.GET("/douyin/user/", userWeb.UserInfo)
 	// Video
 	router.GET("/douyin/feed/", videoWeb.Feed)
+	router.POST("/douyin/favorite/action/", videoWeb.Like)
 	router.Run(":5051")
 }

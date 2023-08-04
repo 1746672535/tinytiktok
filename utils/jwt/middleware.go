@@ -1,10 +1,12 @@
 package jwt
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 )
 
-func JwtAuth() gin.HandlerFunc {
+// Auth gin的中间件, 用于验证jwt
+func Auth() gin.HandlerFunc {
 	// TODO 请将 msg 汇总
 	return func(ctx *gin.Context) {
 		// 从请求头中拿到token
@@ -19,18 +21,16 @@ func JwtAuth() gin.HandlerFunc {
 		// 解析jwt
 		user, err := ParseToken(token)
 		if err != nil {
-			if err == TokenExpired {
-				if err == TokenExpired {
-					// 如果没有token
-					ctx.Set("auth", false)
-					ctx.Set("msg", "授权过期")
-					ctx.Next()
-					return
-				}
+			if errors.Is(err, TokenExpired) {
+				// 如果token过期
+				ctx.Set("auth", false)
+				ctx.Set("msg", "授权过期")
+				ctx.Next()
+				return
 			}
 			// 如果没有token
 			ctx.Set("auth", false)
-			ctx.Set("msg", "未授权")
+			ctx.Set("msg", "非法授权")
 			ctx.Next()
 			return
 		}

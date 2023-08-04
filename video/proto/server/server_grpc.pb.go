@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	like "tinytiktok/video/proto/like"
 	video "tinytiktok/video/proto/video"
 )
 
@@ -21,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	VideoService_Feed_FullMethodName = "/userServer.VideoService/Feed"
+	VideoService_Like_FullMethodName = "/userServer.VideoService/Like"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -28,6 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoServiceClient interface {
 	Feed(ctx context.Context, in *video.FeedRequest, opts ...grpc.CallOption) (*video.FeedResponse, error)
+	Like(ctx context.Context, in *like.LikeRequest, opts ...grpc.CallOption) (*like.LikeResponse, error)
 }
 
 type videoServiceClient struct {
@@ -47,11 +50,21 @@ func (c *videoServiceClient) Feed(ctx context.Context, in *video.FeedRequest, op
 	return out, nil
 }
 
+func (c *videoServiceClient) Like(ctx context.Context, in *like.LikeRequest, opts ...grpc.CallOption) (*like.LikeResponse, error) {
+	out := new(like.LikeResponse)
+	err := c.cc.Invoke(ctx, VideoService_Like_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
 type VideoServiceServer interface {
 	Feed(context.Context, *video.FeedRequest) (*video.FeedResponse, error)
+	Like(context.Context, *like.LikeRequest) (*like.LikeResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -61,6 +74,9 @@ type UnimplementedVideoServiceServer struct {
 
 func (UnimplementedVideoServiceServer) Feed(context.Context, *video.FeedRequest) (*video.FeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Feed not implemented")
+}
+func (UnimplementedVideoServiceServer) Like(context.Context, *like.LikeRequest) (*like.LikeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Like not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -93,6 +109,24 @@ func _VideoService_Feed_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_Like_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(like.LikeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).Like(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_Like_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).Like(ctx, req.(*like.LikeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -103,6 +137,10 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Feed",
 			Handler:    _VideoService_Feed_Handler,
+		},
+		{
+			MethodName: "Like",
+			Handler:    _VideoService_Like_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

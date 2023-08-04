@@ -2,8 +2,9 @@ syntax = "proto3";
 package userServer;
 option go_package = "tinytiktok/video/proto/server";
 import "video/video.proto";
-
+import "video/like.proto";
 
 service VideoService {
   rpc Feed (video.FeedRequest) returns (video.FeedResponse) {}
+  rpc Like (like.LikeRequest) returns (like.LikeResponse) {}
 }
