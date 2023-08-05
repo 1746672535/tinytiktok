@@ -4,9 +4,13 @@ option go_package = "tinytiktok/user/proto/server";
 import "user/register.proto";
 import "user/login.proto";
 import "user/info.proto";
+import "user/favorite.proto";
+
 
 service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}
   rpc Login (login.LoginRequest) returns (login.LoginResponse) {}
   rpc Info (info.UserRequest) returns (info.UserResponse) {}
+  // 用户点赞或取消点赞
+  rpc CalcFavoriteCount (favorite.FavoriteRequest) returns (favorite.FavoriteResponse) {}
 }

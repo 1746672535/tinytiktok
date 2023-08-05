@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	favorite "tinytiktok/user/proto/favorite"
 	info2 "tinytiktok/user/proto/info2"
 	login "tinytiktok/user/proto/login"
 	register "tinytiktok/user/proto/register"
@@ -22,9 +23,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_Register_FullMethodName = "/userServer.UserService/Register"
-	UserService_Login_FullMethodName    = "/userServer.UserService/Login"
-	UserService_Info_FullMethodName     = "/userServer.UserService/Info"
+	UserService_Register_FullMethodName          = "/userServer.UserService/Register"
+	UserService_Login_FullMethodName             = "/userServer.UserService/Login"
+	UserService_Info_FullMethodName              = "/userServer.UserService/Info"
+	UserService_CalcFavoriteCount_FullMethodName = "/userServer.UserService/CalcFavoriteCount"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -34,6 +36,8 @@ type UserServiceClient interface {
 	Register(ctx context.Context, in *register.RegisterRequest, opts ...grpc.CallOption) (*register.RegisterResponse, error)
 	Login(ctx context.Context, in *login.LoginRequest, opts ...grpc.CallOption) (*login.LoginResponse, error)
 	Info(ctx context.Context, in *info2.UserRequest, opts ...grpc.CallOption) (*info2.UserResponse, error)
+	// 用户点赞或取消点赞
+	CalcFavoriteCount(ctx context.Context, in *favorite.FavoriteRequest, opts ...grpc.CallOption) (*favorite.FavoriteResponse, error)
 }
 
 type userServiceClient struct {
@@ -71,6 +75,15 @@ func (c *userServiceClient) Info(ctx context.Context, in *info2.UserRequest, opt
 	return out, nil
 }
 
+func (c *userServiceClient) CalcFavoriteCount(ctx context.Context, in *favorite.FavoriteRequest, opts ...grpc.CallOption) (*favorite.FavoriteResponse, error) {
+	out := new(favorite.FavoriteResponse)
+	err := c.cc.Invoke(ctx, UserService_CalcFavoriteCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -78,6 +91,8 @@ type UserServiceServer interface {
 	Register(context.Context, *register.RegisterRequest) (*register.RegisterResponse, error)
 	Login(context.Context, *login.LoginRequest) (*login.LoginResponse, error)
 	Info(context.Context, *info2.UserRequest) (*info2.UserResponse, error)
+	// 用户点赞或取消点赞
+	CalcFavoriteCount(context.Context, *favorite.FavoriteRequest) (*favorite.FavoriteResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -93,6 +108,9 @@ func (UnimplementedUserServiceServer) Login(context.Context, *login.LoginRequest
 }
 func (UnimplementedUserServiceServer) Info(context.Context, *info2.UserRequest) (*info2.UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Info not implemented")
+}
+func (UnimplementedUserServiceServer) CalcFavoriteCount(context.Context, *favorite.FavoriteRequest) (*favorite.FavoriteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CalcFavoriteCount not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -161,6 +179,24 @@ func _UserService_Info_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_CalcFavoriteCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(favorite.FavoriteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CalcFavoriteCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CalcFavoriteCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CalcFavoriteCount(ctx, req.(*favorite.FavoriteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -179,6 +215,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Info",
 			Handler:    _UserService_Info_Handler,
+		},
+		{
+			MethodName: "CalcFavoriteCount",
+			Handler:    _UserService_CalcFavoriteCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

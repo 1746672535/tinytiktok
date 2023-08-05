@@ -5,6 +5,8 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"net"
+	"os"
+	"tinytiktok/utils/config"
 	"tinytiktok/utils/consul"
 	"tinytiktok/utils/tools"
 	"tinytiktok/video/proto/server"
@@ -12,6 +14,9 @@ import (
 )
 
 func main() {
+	// 初始化配置文件
+	path := os.Getenv("APP")
+	serverConfig := config.NewConfig(fmt.Sprintf("%s\\config", path), "server.yaml", "yaml")
 	// 启动服务
 	g := grpc.NewServer()
 	server.RegisterVideoServiceServer(g, &srv.Handle{})
@@ -21,18 +26,18 @@ func main() {
 	port := tools.GetFreePort()
 	listen, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	// 注册服务
-	reg := consul.NewRegistry("127.0.0.1", 8500)
+	reg := consul.NewRegistry(serverConfig.ReadString("Consul.Host"), serverConfig.ReadInt("Consul.Port"))
 	reg.Register(&consul.Server{
 		Address: ip,
 		Port:    port,
-		Name:    "video-srv",
+		Name:    serverConfig.ReadString("Video.Name"),
 		Id:      id,
-		Tags:    []string{"video", "srv"},
+		Tags:    serverConfig.ReadStringSlice("Video.Tag"),
 		HealthCheck: consul.HealthCheck{
 			TCP:                            fmt.Sprintf("%s:%d", ip, port),
-			Timeout:                        "3s",
-			Interval:                       "5s",
-			DeregisterCriticalServiceAfter: "10s",
+			Timeout:                        serverConfig.ReadString("Video.Timeout"),
+			Interval:                       serverConfig.ReadString("Video.Interval"),
+			DeregisterCriticalServiceAfter: serverConfig.ReadString("Video.DeregisterCriticalServiceAfter"),
 		},
 	})
 	// 延迟注销服务

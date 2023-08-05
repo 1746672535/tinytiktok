@@ -7,9 +7,14 @@ import (
 	"os"
 	"tinytiktok/utils/config"
 	"tinytiktok/video/models"
+	"tinytiktok/video/proto/server"
 )
 
 var VideoDb *gorm.DB
+
+type Handle struct {
+	server.UnimplementedVideoServiceServer
+}
 
 func init() {
 	// 初始化配置文件

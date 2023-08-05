@@ -18,5 +18,6 @@ func main() {
 	// Video
 	router.GET("/douyin/feed/", videoWeb.Feed)
 	router.POST("/douyin/favorite/action/", videoWeb.Like)
+	router.GET("/douyin/favorite/list/", videoWeb.Favorite)
 	router.Run(":5051")
 }

@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	favorite "tinytiktok/video/proto/favorite"
 	like "tinytiktok/video/proto/like"
 	video "tinytiktok/video/proto/video"
 )
@@ -21,16 +22,21 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	VideoService_Feed_FullMethodName = "/userServer.VideoService/Feed"
-	VideoService_Like_FullMethodName = "/userServer.VideoService/Like"
+	VideoService_Feed_FullMethodName         = "/userServer.VideoService/Feed"
+	VideoService_Like_FullMethodName         = "/userServer.VideoService/Like"
+	VideoService_FavoriteList_FullMethodName = "/userServer.VideoService/FavoriteList"
 )
 
 // VideoServiceClient is the client API for VideoService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoServiceClient interface {
+	// 返回最近30条视频信息[最多]
 	Feed(ctx context.Context, in *video.FeedRequest, opts ...grpc.CallOption) (*video.FeedResponse, error)
+	// 用户点赞实现
 	Like(ctx context.Context, in *like.LikeRequest, opts ...grpc.CallOption) (*like.LikeResponse, error)
+	// 返回用户喜欢的视频列表
+	FavoriteList(ctx context.Context, in *favorite.FavoriteListRequest, opts ...grpc.CallOption) (*favorite.FavoriteListResponse, error)
 }
 
 type videoServiceClient struct {
@@ -59,12 +65,25 @@ func (c *videoServiceClient) Like(ctx context.Context, in *like.LikeRequest, opt
 	return out, nil
 }
 
+func (c *videoServiceClient) FavoriteList(ctx context.Context, in *favorite.FavoriteListRequest, opts ...grpc.CallOption) (*favorite.FavoriteListResponse, error) {
+	out := new(favorite.FavoriteListResponse)
+	err := c.cc.Invoke(ctx, VideoService_FavoriteList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
 type VideoServiceServer interface {
+	// 返回最近30条视频信息[最多]
 	Feed(context.Context, *video.FeedRequest) (*video.FeedResponse, error)
+	// 用户点赞实现
 	Like(context.Context, *like.LikeRequest) (*like.LikeResponse, error)
+	// 返回用户喜欢的视频列表
+	FavoriteList(context.Context, *favorite.FavoriteListRequest) (*favorite.FavoriteListResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -77,6 +96,9 @@ func (UnimplementedVideoServiceServer) Feed(context.Context, *video.FeedRequest)
 }
 func (UnimplementedVideoServiceServer) Like(context.Context, *like.LikeRequest) (*like.LikeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Like not implemented")
+}
+func (UnimplementedVideoServiceServer) FavoriteList(context.Context, *favorite.FavoriteListRequest) (*favorite.FavoriteListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FavoriteList not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -127,6 +149,24 @@ func _VideoService_Like_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_FavoriteList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(favorite.FavoriteListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).FavoriteList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_FavoriteList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).FavoriteList(ctx, req.(*favorite.FavoriteListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +181,10 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Like",
 			Handler:    _VideoService_Like_Handler,
+		},
+		{
+			MethodName: "FavoriteList",
+			Handler:    _VideoService_FavoriteList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

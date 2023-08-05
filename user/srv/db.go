@@ -6,10 +6,15 @@ import (
 	"gorm.io/gorm"
 	"os"
 	"tinytiktok/user/models"
+	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/config"
 )
 
 var UserDb *gorm.DB
+
+type Handle struct {
+	server.UnimplementedUserServiceServer
+}
 
 func init() {
 	// 初始化配置文件

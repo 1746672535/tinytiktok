@@ -1,0 +1,13 @@
+syntax = "proto3";
+package favorite;
+option go_package = "tinytiktok/user/proto/favorite";
+
+message FavoriteRequest{
+  int64 user_id = 1;
+  bool isFavorite = 2;
+}
+
+message FavoriteResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}

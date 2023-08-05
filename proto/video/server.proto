@@ -3,8 +3,13 @@ package userServer;
 option go_package = "tinytiktok/video/proto/server";
 import "video/video.proto";
 import "video/like.proto";
+import "video/favorite.proto";
 
 service VideoService {
+  // 返回最近30条视频信息[最多]
   rpc Feed (video.FeedRequest) returns (video.FeedResponse) {}
+  // 用户点赞实现
   rpc Like (like.LikeRequest) returns (like.LikeResponse) {}
+  // 返回用户喜欢的视频列表
+  rpc FavoriteList (favorite.FavoriteListRequest) returns (favorite.FavoriteListResponse) {}
 }
