@@ -38,7 +38,7 @@ func Auth() gin.HandlerFunc {
 		ctx.Set("msg", TokenValid)
 		ctx.Set("user", user)
 		ctx.Set("userName", user.Name)
-		ctx.Set("userId", user.ID)
+		ctx.Set("userID", user.ID)
 		ctx.Next()
 		return
 	}

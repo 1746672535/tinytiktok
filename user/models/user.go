@@ -28,10 +28,10 @@ func (User) TableName() string {
 }
 
 // GetUserInfo 获取用户信息
-func GetUserInfo(db *gorm.DB, userId int64) (*User, error) {
+func GetUserInfo(db *gorm.DB, userID int64) (*User, error) {
 	// 根据用户 Name 查询用户
 	var user User
-	result := db.Where("id = ?", userId).First(&user)
+	result := db.Where("id = ?", userID).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}

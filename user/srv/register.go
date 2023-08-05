@@ -8,13 +8,13 @@ import (
 
 // Register 用户注册
 func (h *Handle) Register(ctx context.Context, req *register.RegisterRequest) (rsp *register.RegisterResponse, err error) {
-	userId, err := models.InsertUser(UserDb, req.Username, req.Password)
+	userID, err := models.InsertUser(UserDb, req.Username, req.Password)
 	if err != nil {
 		return nil, err
 	}
 	// 返回信息
 	rsp = &register.RegisterResponse{}
-	rsp.UserId = userId
+	rsp.UserId = userID
 	rsp.StatusCode = 0
 	rsp.StatusMsg = "ok"
 	return rsp, nil

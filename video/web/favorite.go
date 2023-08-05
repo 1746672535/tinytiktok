@@ -15,14 +15,14 @@ func Favorite(ctx *gin.Context) {
 	if !ctx.GetBool("auth") {
 		return
 	}
-	userId := ctx.GetInt64("userId")
+	userID := ctx.GetInt64("userID")
 	md := metadata.Pairs()
 	// 访问srv层
 	conn := consul.GetClientConn("video-srv")
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, _ := client.FavoriteList(metadata.NewOutgoingContext(context.Background(), md), &favorite.FavoriteListRequest{
-		UserId: userId,
+		UserId: userID,
 	})
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": rsp.StatusCode,

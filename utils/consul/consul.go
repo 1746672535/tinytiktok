@@ -29,7 +29,7 @@ type Server struct {
 	Address string
 	Port    int
 	Name    string
-	Id      string
+	ID      string
 	Tags    []string
 	// 健康检查
 	HealthCheck HealthCheck
@@ -56,7 +56,7 @@ func (r *Registry) Register(server *Server) error {
 	//生成注册对象
 	registration := api.AgentServiceRegistration{
 		Name:    server.Name,
-		ID:      server.Id,
+		ID:      server.ID,
 		Address: server.Address,
 		Port:    server.Port,
 		Tags:    server.Tags,
@@ -75,7 +75,7 @@ func (r *Registry) Register(server *Server) error {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		_ = r.DeRegister(server.Id)
+		_ = r.DeRegister(server.ID)
 		os.Exit(0)
 	}()
 	return err

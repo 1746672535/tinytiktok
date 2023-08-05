@@ -31,7 +31,7 @@ func main() {
 		Address: ip,
 		Port:    port,
 		Name:    serverConfig.ReadString("User.Name"),
-		Id:      id,
+		ID:      id,
 		Tags:    serverConfig.ReadStringSlice("User.Tag"),
 		HealthCheck: consul.HealthCheck{
 			TCP:                            fmt.Sprintf("%s:%d", ip, port),

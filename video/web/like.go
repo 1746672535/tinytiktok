@@ -17,11 +17,11 @@ func Like(ctx *gin.Context) {
 		return
 	}
 	// 2. 调用srv层给视频点赞
-	userId := ctx.GetInt64("userId")
+	userID := ctx.GetInt64("userID")
 	// 创建md
 	md := metadata.Pairs()
-	videoId := ctx.DefaultQuery("video_id", "-1")
-	videoIdInt, _ := strconv.Atoi(videoId)
+	videoID := ctx.DefaultQuery("video_id", "-1")
+	videoIDInt, _ := strconv.Atoi(videoID)
 	actionType := ctx.DefaultQuery("action_type", "-1")
 	ActionType := 2
 	if actionType == "1" {
@@ -33,8 +33,8 @@ func Like(ctx *gin.Context) {
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, _ := client.Like(metadata.NewOutgoingContext(context.Background(), md), &like.LikeRequest{
-		UserId:     userId,
-		VideoId:    int64(videoIdInt),
+		UserId:     userID,
+		VideoId:    int64(videoIDInt),
 		ActionType: int32(ActionType),
 	})
 	// 3. 返回结果

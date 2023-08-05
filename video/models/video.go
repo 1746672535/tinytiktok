@@ -48,9 +48,9 @@ func GetVideoList(db *gorm.DB, lastTime int64) []*Video {
 }
 
 // GetVideoById 根据视频的ID返回视频信息
-func GetVideoById(db *gorm.DB, videoId int64) (*Video, error) {
+func GetVideoById(db *gorm.DB, videoID int64) (*Video, error) {
 	var video *Video
-	result := db.Where("id = ?", videoId).First(&video)
+	result := db.Where("id = ?", videoID).First(&video)
 	// 检查是否找到了对应的视频
 	if result.Error != nil {
 		return nil, result.Error

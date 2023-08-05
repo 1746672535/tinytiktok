@@ -26,7 +26,7 @@ func (l Like) TableName() string {
 }
 
 // CalcFavoriteCountByUserID 根据id查找用户 - 并不属于video服务的范围, 所以需要去调用我们的user服务
-func CalcFavoriteCountByUserID(userId int64, isFavorite bool) (err error) {
+func CalcFavoriteCountByUserID(userID int64, isFavorite bool) (err error) {
 	// TODO 请提取为公共方法
 	service, _ := consul.Reg.FindService("user-srv")
 	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", service.Address, service.Port), grpc.WithInsecure())
@@ -36,7 +36,7 @@ func CalcFavoriteCountByUserID(userId int64, isFavorite bool) (err error) {
 	// 发送请求
 	rsp := &favorite.FavoriteResponse{}
 	rsp, _ = client.CalcFavoriteCount(metadata.NewOutgoingContext(context.Background(), nil), &favorite.FavoriteRequest{
-		UserId:     userId,
+		UserId:     userID,
 		IsFavorite: isFavorite,
 	})
 	if err != nil || rsp.StatusCode != 0 {
@@ -46,12 +46,12 @@ func CalcFavoriteCountByUserID(userId int64, isFavorite bool) (err error) {
 }
 
 // CalcFavoriteCountByVideoID 如果用户点赞视频, 则给视频的点赞数量 +1 / -1
-func CalcFavoriteCountByVideoID(db *gorm.DB, videoId int64, isFavorite bool) error {
+func CalcFavoriteCountByVideoID(db *gorm.DB, videoID int64, isFavorite bool) error {
 	var video Video
-	result := db.First(&video, videoId)
+	result := db.First(&video, videoID)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("video with ID %d not found", videoId)
+			return fmt.Errorf("video with ID %d not found", videoID)
 		} else {
 			return result.Error
 		}
@@ -121,7 +121,7 @@ func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
 	// TODO 请使用事务重构该功能
 	// 为视频点赞数量 +1 / -1
 	CalcFavoriteCountByVideoID(db, videoID, isFavorite)
-	// 为用户的点赞数量 +1 /-1
+	// 为用户的点赞数量 +1 / -1
 	CalcFavoriteCountByUserID(userID, isFavorite)
 	return nil
 }

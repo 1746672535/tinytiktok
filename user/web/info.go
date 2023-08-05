@@ -22,7 +22,7 @@ func UserInfo(ctx *gin.Context) {
 		return
 	}
 	id := ctx.DefaultQuery("user_id", "-1")
-	userId, err := strconv.Atoi(id)
+	userID, err := strconv.Atoi(id)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func UserInfo(ctx *gin.Context) {
 	client := server.NewUserServiceClient(conn)
 	// 发送请求
 	rsp, _ := client.Info(metadata.NewOutgoingContext(context.Background(), md), &info2.UserRequest{
-		UserId: int64(userId),
+		UserId: int64(userID),
 	})
 	//
 	ctx.JSON(http.StatusOK, gin.H{
