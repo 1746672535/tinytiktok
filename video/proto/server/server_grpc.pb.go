@@ -12,8 +12,9 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	favorite "tinytiktok/video/proto/favorite"
+	feed "tinytiktok/video/proto/feed"
 	like "tinytiktok/video/proto/like"
-	video "tinytiktok/video/proto/video"
+	publish "tinytiktok/video/proto/publish"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,6 +26,7 @@ const (
 	VideoService_Feed_FullMethodName         = "/userServer.VideoService/Feed"
 	VideoService_Like_FullMethodName         = "/userServer.VideoService/Like"
 	VideoService_FavoriteList_FullMethodName = "/userServer.VideoService/FavoriteList"
+	VideoService_Publish_FullMethodName      = "/userServer.VideoService/Publish"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -32,11 +34,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoServiceClient interface {
 	// 返回最近30条视频信息[最多]
-	Feed(ctx context.Context, in *video.FeedRequest, opts ...grpc.CallOption) (*video.FeedResponse, error)
+	Feed(ctx context.Context, in *feed.FeedRequest, opts ...grpc.CallOption) (*feed.FeedResponse, error)
 	// 用户点赞实现
 	Like(ctx context.Context, in *like.LikeRequest, opts ...grpc.CallOption) (*like.LikeResponse, error)
 	// 返回用户喜欢的视频列表
 	FavoriteList(ctx context.Context, in *favorite.FavoriteListRequest, opts ...grpc.CallOption) (*favorite.FavoriteListResponse, error)
+	// 用户发布视频实现
+	Publish(ctx context.Context, in *publish.PublishRequest, opts ...grpc.CallOption) (*publish.PublishResponse, error)
 }
 
 type videoServiceClient struct {
@@ -47,8 +51,8 @@ func NewVideoServiceClient(cc grpc.ClientConnInterface) VideoServiceClient {
 	return &videoServiceClient{cc}
 }
 
-func (c *videoServiceClient) Feed(ctx context.Context, in *video.FeedRequest, opts ...grpc.CallOption) (*video.FeedResponse, error) {
-	out := new(video.FeedResponse)
+func (c *videoServiceClient) Feed(ctx context.Context, in *feed.FeedRequest, opts ...grpc.CallOption) (*feed.FeedResponse, error) {
+	out := new(feed.FeedResponse)
 	err := c.cc.Invoke(ctx, VideoService_Feed_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,16 +78,27 @@ func (c *videoServiceClient) FavoriteList(ctx context.Context, in *favorite.Favo
 	return out, nil
 }
 
+func (c *videoServiceClient) Publish(ctx context.Context, in *publish.PublishRequest, opts ...grpc.CallOption) (*publish.PublishResponse, error) {
+	out := new(publish.PublishResponse)
+	err := c.cc.Invoke(ctx, VideoService_Publish_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
 type VideoServiceServer interface {
 	// 返回最近30条视频信息[最多]
-	Feed(context.Context, *video.FeedRequest) (*video.FeedResponse, error)
+	Feed(context.Context, *feed.FeedRequest) (*feed.FeedResponse, error)
 	// 用户点赞实现
 	Like(context.Context, *like.LikeRequest) (*like.LikeResponse, error)
 	// 返回用户喜欢的视频列表
 	FavoriteList(context.Context, *favorite.FavoriteListRequest) (*favorite.FavoriteListResponse, error)
+	// 用户发布视频实现
+	Publish(context.Context, *publish.PublishRequest) (*publish.PublishResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -91,7 +106,7 @@ type VideoServiceServer interface {
 type UnimplementedVideoServiceServer struct {
 }
 
-func (UnimplementedVideoServiceServer) Feed(context.Context, *video.FeedRequest) (*video.FeedResponse, error) {
+func (UnimplementedVideoServiceServer) Feed(context.Context, *feed.FeedRequest) (*feed.FeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Feed not implemented")
 }
 func (UnimplementedVideoServiceServer) Like(context.Context, *like.LikeRequest) (*like.LikeResponse, error) {
@@ -99,6 +114,9 @@ func (UnimplementedVideoServiceServer) Like(context.Context, *like.LikeRequest) 
 }
 func (UnimplementedVideoServiceServer) FavoriteList(context.Context, *favorite.FavoriteListRequest) (*favorite.FavoriteListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FavoriteList not implemented")
+}
+func (UnimplementedVideoServiceServer) Publish(context.Context, *publish.PublishRequest) (*publish.PublishResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -114,7 +132,7 @@ func RegisterVideoServiceServer(s grpc.ServiceRegistrar, srv VideoServiceServer)
 }
 
 func _VideoService_Feed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(video.FeedRequest)
+	in := new(feed.FeedRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -126,7 +144,7 @@ func _VideoService_Feed_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: VideoService_Feed_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VideoServiceServer).Feed(ctx, req.(*video.FeedRequest))
+		return srv.(VideoServiceServer).Feed(ctx, req.(*feed.FeedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -167,6 +185,24 @@ func _VideoService_FavoriteList_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(publish.PublishRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).Publish(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_Publish_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).Publish(ctx, req.(*publish.PublishRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -185,6 +221,10 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FavoriteList",
 			Handler:    _VideoService_FavoriteList_Handler,
+		},
+		{
+			MethodName: "Publish",
+			Handler:    _VideoService_Publish_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

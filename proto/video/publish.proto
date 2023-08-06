@@ -1,0 +1,18 @@
+syntax = "proto3";
+package publish;
+option go_package = "tinytiktok/video/proto/publish";
+
+
+
+message PublishRequest {
+  string token = 1;      // 用户鉴权token
+  int64 author_id = 2;   // 作者ID
+  string title = 3;      // 视频标题
+  string play_url = 4;   // 视频URL
+  string cover_url = 5 ; // 封面图URL
+}
+
+message PublishResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+}

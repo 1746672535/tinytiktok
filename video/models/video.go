@@ -72,3 +72,12 @@ func GetUserFavoriteVideoList(db *gorm.DB, userId int64) ([]*Video, error) {
 	}
 	return videoList, nil
 }
+
+// InsertVideo 插入Video数据到数据库
+func InsertVideo(db *gorm.DB, video *Video) error {
+	result := db.Create(video)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

@@ -83,7 +83,7 @@ func IsUserLikedVideo(db *gorm.DB, videoID, userID int64) (bool, error) {
 	}
 	// 找到记录，表示用户已点赞该视频
 	if like.State {
-		return true, nil
+		return like.State, nil
 	}
 	return false, nil
 }

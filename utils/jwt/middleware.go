@@ -10,6 +10,10 @@ func Auth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 从请求头中拿到token
 		token := ctx.DefaultQuery("token", "")
+		// 部分接口使用form表单提交token
+		if t, ok := ctx.GetPostForm("token"); ok {
+			token = t
+		}
 		if token == "" {
 			// 如果没有token
 			ctx.Set("auth", false)

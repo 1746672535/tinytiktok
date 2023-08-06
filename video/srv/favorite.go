@@ -26,9 +26,8 @@ func (h *Handle) FavoriteList(ctx context.Context, req *favorite.FavoriteListReq
 			CoverUrl:      v.CoverURL,
 			FavoriteCount: v.FavoriteCount,
 			CommentCount:  v.CommentCount,
-			// TODO
-			IsFavorite: false,
-			Title:      v.Title,
+			IsFavorite:    true,
+			Title:         v.Title,
 		})
 	}
 	rsp.VideoList = videos

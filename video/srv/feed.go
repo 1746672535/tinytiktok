@@ -4,12 +4,13 @@ import (
 	"context"
 	"tinytiktok/user/proto/info2"
 	"tinytiktok/video/models"
+	"tinytiktok/video/proto/feed"
 	"tinytiktok/video/proto/video"
 )
 
 // Feed 获取视频列表
-func (h *Handle) Feed(ctx context.Context, req *video.FeedRequest) (rsp *video.FeedResponse, err error) {
-	rsp = &video.FeedResponse{}
+func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.FeedResponse, err error) {
+	rsp = &feed.FeedResponse{}
 	// 获取最近30条视频信息
 	videos := models.GetVideoList(VideoDb, req.LatestTime)
 	var videoList []*video.Video
@@ -20,7 +21,7 @@ func (h *Handle) Feed(ctx context.Context, req *video.FeedRequest) (rsp *video.F
 			continue
 		}
 		// 查询该视频是否被该用户点赞
-		like, err := models.IsUserLikedVideo(VideoDb, v.ID, v.AuthorID)
+		like, err := models.IsUserLikedVideo(VideoDb, v.ID, req.UserId)
 		if err != nil {
 			continue
 		}

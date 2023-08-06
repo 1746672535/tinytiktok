@@ -8,13 +8,14 @@ import (
 	"net/http"
 	"strconv"
 	"tinytiktok/utils/consul"
+	"tinytiktok/video/proto/feed"
 	"tinytiktok/video/proto/server"
-	"tinytiktok/video/proto/video"
 )
 
 func Feed(ctx *gin.Context) {
 	lastTime := ctx.DefaultQuery("latest_time", "-1")
 	lastTimeInt, err := strconv.Atoi(lastTime)
+	userID := ctx.GetInt64("userID")
 	if err != nil {
 		return
 	}
@@ -28,7 +29,8 @@ func Feed(ctx *gin.Context) {
 	conn := consul.GetClientConn("video-srv")
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
-	rsp, _ := client.Feed(metadata.NewOutgoingContext(context.Background(), md), &video.FeedRequest{
+	rsp, _ := client.Feed(metadata.NewOutgoingContext(context.Background(), md), &feed.FeedRequest{
+		UserId:     userID,
 		LatestTime: int64(lastTimeInt / 1000),
 	})
 	ctx.JSON(http.StatusOK, gin.H{
