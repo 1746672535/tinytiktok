@@ -81,3 +81,13 @@ func InsertVideo(db *gorm.DB, video *Video) error {
 	}
 	return nil
 }
+
+// GetVideoListByUserID 根据用户ID获取视频列表
+func GetVideoListByUserID(db *gorm.DB, userID int64) ([]*Video, error) {
+	var videos []*Video
+	err := db.Where("author_id = ?", userID).Find(&videos).Error
+	if err != nil {
+		return nil, err
+	}
+	return videos, nil
+}

@@ -98,3 +98,22 @@ func CalcFavoriteCountByUserID(db *gorm.DB, userID int64, isFavorite bool) error
 	}
 	return nil
 }
+
+// CalcWorkCountByUserID 计算用户的作品数量
+func CalcWorkCountByUserID(db *gorm.DB, userID int64, isPublish bool) error {
+	var user User
+	// 从数据库中获取对应用户的信息
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
+	}
+	if isPublish {
+		user.WorkCount++
+	} else {
+		user.WorkCount--
+	}
+	// 将修改后的User结构体保存回数据库
+	if err := db.Save(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}

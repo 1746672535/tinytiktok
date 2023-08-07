@@ -12,7 +12,9 @@ func (h *Handle) Like(ctx context.Context, req *like.LikeRequest) (rsp *like.Lik
 	isFavorite := req.ActionType == 1
 	err = models.LikeVideo(VideoDb, req.VideoId, req.UserId, isFavorite)
 	if err != nil {
-		return nil, err
+		rsp.StatusCode = 1
+		rsp.StatusMsg = "请勿重复点赞"
+		return rsp, err
 	}
 	rsp.StatusCode = 0
 	rsp.StatusMsg = "ok"

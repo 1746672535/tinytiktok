@@ -2,7 +2,6 @@ package srv
 
 import (
 	"context"
-	"tinytiktok/user/proto/info2"
 	"tinytiktok/video/models"
 	"tinytiktok/video/proto/feed"
 	"tinytiktok/video/proto/video"
@@ -21,9 +20,12 @@ func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.Fee
 			continue
 		}
 		// 查询该视频是否被该用户点赞
-		like, err := models.IsUserLikedVideo(VideoDb, v.ID, req.UserId)
-		if err != nil {
-			continue
+		like := false
+		if req.UserId != 0 {
+			like, err = models.IsUserLikedVideo(VideoDb, v.ID, req.UserId)
+			if err != nil {
+				continue
+			}
 		}
 		// 查询视频的点赞数量
 		favoriteCount, err := models.GetVideoLikesCount(VideoDb, v.ID)
@@ -33,20 +35,7 @@ func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.Fee
 		videoList = append(videoList, &video.Video{
 			Id: v.ID,
 			// 视频作者
-			Author: &info2.User{
-				Id:            author.Id,
-				Name:          author.Name,
-				FollowCount:   author.FollowCount,
-				FollowerCount: author.FollowerCount,
-				// TODO 用户是否关注该作者
-				IsFollow:        false,
-				Avatar:          author.Avatar,
-				BackgroundImage: author.BackgroundImage,
-				Signature:       author.Signature,
-				TotalFavorited:  author.TotalFavorited,
-				WorkCount:       author.WorkCount,
-				FavoriteCount:   author.FavoriteCount,
-			},
+			Author:   author,
 			PlayUrl:  v.PlayURL,
 			CoverUrl: v.CoverURL,
 			// 视频的点赞总数

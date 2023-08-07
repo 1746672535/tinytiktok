@@ -39,5 +39,5 @@ func UploadFile(file *multipart.FileHeader, userID int64) (string, error) {
 	if err != nil || !rsp.Ok {
 		return "", err
 	}
-	return fmt.Sprintf("%s/group1/tinytiktok/video/%d/%s", FileServerURL, userID, videoUUID), err
+	return fmt.Sprintf("%s/group1/%s/%d/%s", FileServerURL, SavePath, userID, videoUUID), err
 }

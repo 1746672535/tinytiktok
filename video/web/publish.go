@@ -40,3 +40,25 @@ func Publish(ctx *gin.Context) {
 		"status_msg":  rsp.StatusMsg,
 	})
 }
+
+func PublishList(ctx *gin.Context) {
+	// 鉴权
+	if !ctx.GetBool("auth") {
+		return
+	}
+	// 如果鉴权成功, 可以从ctx里面拿到用户id
+	userID := ctx.GetInt64("userID")
+	// 将请求转发到srv层
+	md := metadata.Pairs()
+	conn := consul.GetClientConn("video-srv")
+	defer conn.Close()
+	client := server.NewVideoServiceClient(conn)
+	rsp, _ := client.PublishList(metadata.NewOutgoingContext(context.Background(), md), &publish.PublishListRequest{
+		UserId: userID,
+	})
+	ctx.JSON(http.StatusOK, gin.H{
+		"status_code": rsp.StatusCode,
+		"status_msg":  rsp.StatusMsg,
+		"video_list":  rsp.VideoList,
+	})
+}

@@ -20,5 +20,6 @@ func main() {
 	router.POST("/douyin/favorite/action/", videoWeb.Like)
 	router.GET("/douyin/favorite/list/", videoWeb.Favorite)
 	router.POST("/douyin/publish/action/", videoWeb.Publish)
+	router.GET("/douyin/publish/list/", videoWeb.PublishList)
 	_ = router.Run(":5051")
 }

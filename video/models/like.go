@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"time"
 	"tinytiktok/user/proto/favorite"
+	"tinytiktok/user/proto/publish"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/consul"
 )
@@ -34,10 +35,30 @@ func CalcFavoriteCountByUserID(userID int64, isFavorite bool) (err error) {
 	// 获取client
 	client := server.NewUserServiceClient(conn)
 	// 发送请求
-	rsp := &favorite.FavoriteResponse{}
-	rsp, _ = client.CalcFavoriteCount(metadata.NewOutgoingContext(context.Background(), nil), &favorite.FavoriteRequest{
+	rsp := &favorite.CalcFavoriteCountResponse{}
+	rsp, _ = client.CalcFavoriteCount(metadata.NewOutgoingContext(context.Background(), nil), &favorite.CalcFavoriteCountRequest{
 		UserId:     userID,
 		IsFavorite: isFavorite,
+	})
+	if err != nil || rsp.StatusCode != 0 {
+		return errors.New(rsp.StatusMsg)
+	}
+	return nil
+}
+
+// CalcWorkCountByUserID 根据id查找用户 - 并不属于video服务的范围, 所以需要去调用我们的user服务
+func CalcWorkCountByUserID(userID int64, isPublish bool) (err error) {
+	// TODO 请提取为公共方法
+	service, _ := consul.Reg.FindService("user-srv")
+	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", service.Address, service.Port), grpc.WithInsecure())
+	defer conn.Close()
+	// 获取client
+	client := server.NewUserServiceClient(conn)
+	// 发送请求
+	rsp := &publish.CalcWorkCountResponse{}
+	rsp, _ = client.CalcWorkCount(metadata.NewOutgoingContext(context.Background(), nil), &publish.CalcWorkCountRequest{
+		UserId:    userID,
+		IsPublish: isPublish,
 	})
 	if err != nil || rsp.StatusCode != 0 {
 		return errors.New(rsp.StatusMsg)
@@ -109,6 +130,10 @@ func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
 			return result.Error
 		}
 	} else {
+		if like.State && isFavorite {
+			// 避免重复点赞
+			return errors.New("repeat likes")
+		}
 		// 记录已存在，更新结果和更新时间
 		like.UpdatedAt = time.Now()
 		like.State = isFavorite

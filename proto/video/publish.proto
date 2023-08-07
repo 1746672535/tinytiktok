@@ -1,7 +1,7 @@
 syntax = "proto3";
 package publish;
 option go_package = "tinytiktok/video/proto/publish";
-
+import "video/video.proto";
 
 
 message PublishRequest {
@@ -15,4 +15,16 @@ message PublishRequest {
 message PublishResponse {
   int32 status_code = 1; // 状态码，0-成功，其他值-失败
   string status_msg = 2; // 返回状态描述
+}
+
+
+message PublishListRequest {
+  int64 user_id = 1; // 用户id
+  string token = 2; // 用户鉴权token
+}
+
+message PublishListResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated video.Video video_list = 3; // 用户发布的视频列表
 }

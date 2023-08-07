@@ -14,6 +14,7 @@ import (
 	favorite "tinytiktok/user/proto/favorite"
 	info2 "tinytiktok/user/proto/info2"
 	login "tinytiktok/user/proto/login"
+	publish "tinytiktok/user/proto/publish"
 	register "tinytiktok/user/proto/register"
 )
 
@@ -27,6 +28,7 @@ const (
 	UserService_Login_FullMethodName             = "/userServer.UserService/Login"
 	UserService_Info_FullMethodName              = "/userServer.UserService/Info"
 	UserService_CalcFavoriteCount_FullMethodName = "/userServer.UserService/CalcFavoriteCount"
+	UserService_CalcWorkCount_FullMethodName     = "/userServer.UserService/CalcWorkCount"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -37,7 +39,9 @@ type UserServiceClient interface {
 	Login(ctx context.Context, in *login.LoginRequest, opts ...grpc.CallOption) (*login.LoginResponse, error)
 	Info(ctx context.Context, in *info2.UserRequest, opts ...grpc.CallOption) (*info2.UserResponse, error)
 	// 用户点赞或取消点赞
-	CalcFavoriteCount(ctx context.Context, in *favorite.FavoriteRequest, opts ...grpc.CallOption) (*favorite.FavoriteResponse, error)
+	CalcFavoriteCount(ctx context.Context, in *favorite.CalcFavoriteCountRequest, opts ...grpc.CallOption) (*favorite.CalcFavoriteCountResponse, error)
+	// 用户发表/删除视频时需要增加/减少用户的作品数量
+	CalcWorkCount(ctx context.Context, in *publish.CalcWorkCountRequest, opts ...grpc.CallOption) (*publish.CalcWorkCountResponse, error)
 }
 
 type userServiceClient struct {
@@ -75,9 +79,18 @@ func (c *userServiceClient) Info(ctx context.Context, in *info2.UserRequest, opt
 	return out, nil
 }
 
-func (c *userServiceClient) CalcFavoriteCount(ctx context.Context, in *favorite.FavoriteRequest, opts ...grpc.CallOption) (*favorite.FavoriteResponse, error) {
-	out := new(favorite.FavoriteResponse)
+func (c *userServiceClient) CalcFavoriteCount(ctx context.Context, in *favorite.CalcFavoriteCountRequest, opts ...grpc.CallOption) (*favorite.CalcFavoriteCountResponse, error) {
+	out := new(favorite.CalcFavoriteCountResponse)
 	err := c.cc.Invoke(ctx, UserService_CalcFavoriteCount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) CalcWorkCount(ctx context.Context, in *publish.CalcWorkCountRequest, opts ...grpc.CallOption) (*publish.CalcWorkCountResponse, error) {
+	out := new(publish.CalcWorkCountResponse)
+	err := c.cc.Invoke(ctx, UserService_CalcWorkCount_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +105,9 @@ type UserServiceServer interface {
 	Login(context.Context, *login.LoginRequest) (*login.LoginResponse, error)
 	Info(context.Context, *info2.UserRequest) (*info2.UserResponse, error)
 	// 用户点赞或取消点赞
-	CalcFavoriteCount(context.Context, *favorite.FavoriteRequest) (*favorite.FavoriteResponse, error)
+	CalcFavoriteCount(context.Context, *favorite.CalcFavoriteCountRequest) (*favorite.CalcFavoriteCountResponse, error)
+	// 用户发表/删除视频时需要增加/减少用户的作品数量
+	CalcWorkCount(context.Context, *publish.CalcWorkCountRequest) (*publish.CalcWorkCountResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -109,8 +124,11 @@ func (UnimplementedUserServiceServer) Login(context.Context, *login.LoginRequest
 func (UnimplementedUserServiceServer) Info(context.Context, *info2.UserRequest) (*info2.UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Info not implemented")
 }
-func (UnimplementedUserServiceServer) CalcFavoriteCount(context.Context, *favorite.FavoriteRequest) (*favorite.FavoriteResponse, error) {
+func (UnimplementedUserServiceServer) CalcFavoriteCount(context.Context, *favorite.CalcFavoriteCountRequest) (*favorite.CalcFavoriteCountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalcFavoriteCount not implemented")
+}
+func (UnimplementedUserServiceServer) CalcWorkCount(context.Context, *publish.CalcWorkCountRequest) (*publish.CalcWorkCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CalcWorkCount not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -180,7 +198,7 @@ func _UserService_Info_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _UserService_CalcFavoriteCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(favorite.FavoriteRequest)
+	in := new(favorite.CalcFavoriteCountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -192,7 +210,25 @@ func _UserService_CalcFavoriteCount_Handler(srv interface{}, ctx context.Context
 		FullMethod: UserService_CalcFavoriteCount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CalcFavoriteCount(ctx, req.(*favorite.FavoriteRequest))
+		return srv.(UserServiceServer).CalcFavoriteCount(ctx, req.(*favorite.CalcFavoriteCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_CalcWorkCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(publish.CalcWorkCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CalcWorkCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CalcWorkCount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CalcWorkCount(ctx, req.(*publish.CalcWorkCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -219,6 +255,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CalcFavoriteCount",
 			Handler:    _UserService_CalcFavoriteCount_Handler,
+		},
+		{
+			MethodName: "CalcWorkCount",
+			Handler:    _UserService_CalcWorkCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

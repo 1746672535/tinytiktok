@@ -16,4 +16,5 @@ service VideoService {
   rpc FavoriteList (favorite.FavoriteListRequest) returns (favorite.FavoriteListResponse) {}
   // 用户发布视频实现
   rpc Publish (publish.PublishRequest) returns (publish.PublishResponse) {}
+  rpc PublishList (publish.PublishListRequest) returns (publish.PublishListResponse) {}
 }

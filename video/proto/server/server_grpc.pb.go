@@ -27,6 +27,7 @@ const (
 	VideoService_Like_FullMethodName         = "/userServer.VideoService/Like"
 	VideoService_FavoriteList_FullMethodName = "/userServer.VideoService/FavoriteList"
 	VideoService_Publish_FullMethodName      = "/userServer.VideoService/Publish"
+	VideoService_PublishList_FullMethodName  = "/userServer.VideoService/PublishList"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -41,6 +42,7 @@ type VideoServiceClient interface {
 	FavoriteList(ctx context.Context, in *favorite.FavoriteListRequest, opts ...grpc.CallOption) (*favorite.FavoriteListResponse, error)
 	// 用户发布视频实现
 	Publish(ctx context.Context, in *publish.PublishRequest, opts ...grpc.CallOption) (*publish.PublishResponse, error)
+	PublishList(ctx context.Context, in *publish.PublishListRequest, opts ...grpc.CallOption) (*publish.PublishListResponse, error)
 }
 
 type videoServiceClient struct {
@@ -87,6 +89,15 @@ func (c *videoServiceClient) Publish(ctx context.Context, in *publish.PublishReq
 	return out, nil
 }
 
+func (c *videoServiceClient) PublishList(ctx context.Context, in *publish.PublishListRequest, opts ...grpc.CallOption) (*publish.PublishListResponse, error) {
+	out := new(publish.PublishListResponse)
+	err := c.cc.Invoke(ctx, VideoService_PublishList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type VideoServiceServer interface {
 	FavoriteList(context.Context, *favorite.FavoriteListRequest) (*favorite.FavoriteListResponse, error)
 	// 用户发布视频实现
 	Publish(context.Context, *publish.PublishRequest) (*publish.PublishResponse, error)
+	PublishList(context.Context, *publish.PublishListRequest) (*publish.PublishListResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -117,6 +129,9 @@ func (UnimplementedVideoServiceServer) FavoriteList(context.Context, *favorite.F
 }
 func (UnimplementedVideoServiceServer) Publish(context.Context, *publish.PublishRequest) (*publish.PublishResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
+}
+func (UnimplementedVideoServiceServer) PublishList(context.Context, *publish.PublishListRequest) (*publish.PublishListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PublishList not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -203,6 +218,24 @@ func _VideoService_Publish_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_PublishList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(publish.PublishListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).PublishList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_PublishList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).PublishList(ctx, req.(*publish.PublishListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -225,6 +258,10 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Publish",
 			Handler:    _VideoService_Publish_Handler,
+		},
+		{
+			MethodName: "PublishList",
+			Handler:    _VideoService_PublishList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
