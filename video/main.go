@@ -16,7 +16,7 @@ import (
 func main() {
 	// 初始化配置文件
 	path := os.Getenv("APP")
-	serverConfig := config.NewConfig(fmt.Sprintf("%s\\config", path), "server.yaml", "yaml")
+	serverConfig := config.NewConfig(fmt.Sprintf("%s/config", path), "server.yaml", "yaml")
 	// 启动服务
 	g := grpc.NewServer()
 	server.RegisterVideoServiceServer(g, &srv.Handle{})
@@ -27,7 +27,7 @@ func main() {
 	listen, _ := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	// 注册服务
 	reg := consul.NewRegistry(serverConfig.ReadString("Consul.Host"), serverConfig.ReadInt("Consul.Port"))
-	reg.Register(&consul.Server{
+	err := reg.Register(&consul.Server{
 		Address: ip,
 		Port:    port,
 		Name:    serverConfig.ReadString("Video.Name"),
@@ -40,6 +40,9 @@ func main() {
 			DeregisterCriticalServiceAfter: serverConfig.ReadString("Video.DeregisterCriticalServiceAfter"),
 		},
 	})
+	if err != nil {
+		panic(fmt.Sprintf("服务注册失败: %s", err.Error()))
+	}
 	// 延迟注销服务
 	defer reg.DeRegister(id)
 	_ = g.Serve(listen)

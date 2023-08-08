@@ -7,12 +7,18 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"tinytiktok/utils/config"
 )
 
 var Reg *Registry
 
 func init() {
-	Reg = NewRegistry("127.0.0.1", 8500)
+	// 初始化配置文件
+	path := os.Getenv("APP")
+	consulConfig := config.NewConfig(fmt.Sprintf("%s/config", path), "server.yaml", "yaml")
+	host := consulConfig.ReadString("Consul.Host")
+	port := consulConfig.ReadInt("Consul.Port")
+	Reg = NewRegistry(host, port)
 }
 
 type HealthCheck struct {

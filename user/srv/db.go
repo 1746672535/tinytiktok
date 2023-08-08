@@ -19,7 +19,7 @@ type Handle struct {
 func init() {
 	// 初始化配置文件
 	path := os.Getenv("APP")
-	dbConfig := config.NewConfig(fmt.Sprintf("%s\\config", path), "mysql.yaml", "yaml")
+	dbConfig := config.NewConfig(fmt.Sprintf("%s/config", path), "mysql.yaml", "yaml")
 	// 读取配置
 	address := dbConfig.ReadString("User.Address")
 	port := dbConfig.ReadInt("User.Port")

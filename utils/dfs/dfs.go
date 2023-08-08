@@ -16,7 +16,7 @@ var SavePath string
 func init() {
 	// 初始化配置文件
 	path := os.Getenv("APP")
-	dfsConfig := config.NewConfig(fmt.Sprintf("%s\\config", path), "dfs.yaml", "yaml")
+	dfsConfig := config.NewConfig(fmt.Sprintf("%s/config", path), "dfs.yaml", "yaml")
 	host := dfsConfig.ReadString("Host")
 	port := dfsConfig.ReadInt("Port")
 	FileServerURL = fmt.Sprintf("http://%s:%d", host, port)

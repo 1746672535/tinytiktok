@@ -83,8 +83,9 @@ func InsertUser(db *gorm.DB, username, password string) (int64, error) {
 // CalcFavoriteCountByUserID 计算用户的喜欢数量
 func CalcFavoriteCountByUserID(db *gorm.DB, userID int64, isFavorite bool) error {
 	var user User
+	tx := db.Begin()
 	// 从数据库中获取对应用户的信息
-	if err := db.First(&user, userID).Error; err != nil {
+	if err := tx.First(&user, userID).Error; err != nil {
 		return err
 	}
 	if isFavorite {
@@ -93,9 +94,11 @@ func CalcFavoriteCountByUserID(db *gorm.DB, userID int64, isFavorite bool) error
 		user.FavoriteCount--
 	}
 	// 将修改后的User结构体保存回数据库
-	if err := db.Save(&user).Error; err != nil {
+	if err := tx.Save(&user).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
+	tx.Commit()
 	return nil
 }
 

@@ -31,13 +31,13 @@ func Auth() gin.HandlerFunc {
 				ctx.Next()
 				return
 			}
-			// 如果令牌错误
+			// 如果token错误
 			ctx.Set("auth", false)
 			ctx.Set("msg", TokenInvalid)
 			ctx.Next()
 			return
 		}
-		// 令牌有效
+		// token有效
 		ctx.Set("auth", true)
 		ctx.Set("msg", TokenValid)
 		ctx.Set("user", user)

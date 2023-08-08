@@ -27,7 +27,7 @@ type UserClaims struct {
 
 func init() {
 	path := os.Getenv("APP")
-	jwtConfig := config.NewConfig(fmt.Sprintf("%s\\config", path), "jwt.yaml", "yaml")
+	jwtConfig := config.NewConfig(fmt.Sprintf("%s/config", path), "jwt.yaml", "yaml")
 	SigningKey = []byte(jwtConfig.ReadString("Key"))
 	ExpiresTime = jwtConfig.ReadInt("ExpiresTime")
 }

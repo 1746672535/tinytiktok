@@ -84,6 +84,7 @@ func CalcFavoriteCountByVideoID(db *gorm.DB, videoID int64, isFavorite bool) err
 	}
 	result = db.Save(&video)
 	if result.Error != nil {
+		db.Rollback()
 		return result.Error
 	}
 	return nil
@@ -139,13 +140,18 @@ func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
 		like.State = isFavorite
 		result = db.Save(&like)
 		if result.Error != nil {
+			// 如果出错则将数据回滚
+			db.Rollback()
 			// 更新记录出错
 			return result.Error
 		}
 	}
-	// TODO 请使用事务重构该功能
 	// 为视频点赞数量 +1 / -1
-	CalcFavoriteCountByVideoID(db, videoID, isFavorite)
+	err := CalcFavoriteCountByVideoID(db, videoID, isFavorite)
+	if err != nil {
+		db.Rollback()
+		return err
+	}
 	// 为用户的点赞数量 +1 / -1
 	CalcFavoriteCountByUserID(userID, isFavorite)
 	return nil
