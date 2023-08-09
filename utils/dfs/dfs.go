@@ -12,6 +12,7 @@ import (
 
 var FileServerURL string
 var SavePath string
+var Key string
 
 func init() {
 	// 初始化配置文件
@@ -21,6 +22,7 @@ func init() {
 	port := dfsConfig.ReadInt("Port")
 	FileServerURL = fmt.Sprintf("http://%s:%d", host, port)
 	SavePath = dfsConfig.ReadString("SavePath")
+	Key = dfsConfig.ReadString("Key")
 }
 
 func UploadFile(file *multipart.FileHeader, userID int64) (string, error) {
@@ -31,9 +33,10 @@ func UploadFile(file *multipart.FileHeader, userID int64) (string, error) {
 		// 无需解析视频类型
 		Files: []grequests.FileUpload{{FileContents: fd, FileName: fmt.Sprintf("%s", videoUUID)}},
 		Params: map[string]string{
-			"output": "json",
-			"scene":  "keygo",
-			"path":   fmt.Sprintf("%s/%d", SavePath, userID),
+			"output":     "json",
+			"scene":      "keygo",
+			"path":       fmt.Sprintf("%s/%d", SavePath, userID),
+			"auth_token": Key,
 		}}
 	rsp, err := grequests.Post(fmt.Sprintf("%s/group1/upload", FileServerURL), data)
 	if err != nil || !rsp.Ok {
