@@ -25,6 +25,8 @@ func main() {
 	router.GET("/douyin/publish/list/", videoWeb.PublishList)
 	// dfs
 	router.POST("/dfs/auth/", dfsAuth)
+
+	router.GET("/douyin/relation/follow/list/", userWeb.FollowList)
 	_ = router.Run(":5051")
 }
 

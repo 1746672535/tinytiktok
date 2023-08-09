@@ -6,6 +6,7 @@ import "user/login.proto";
 import "user/info.proto";
 import "user/favorite.proto";
 import "user/publish.proto";
+import "user/followlist.proto";
 
 
 service UserService {
@@ -16,4 +17,6 @@ service UserService {
   rpc CalcFavoriteCount (favorite.CalcFavoriteCountRequest) returns (favorite.CalcFavoriteCountResponse) {}
   // 用户发表/删除视频时需要增加/减少用户的作品数量
   rpc CalcWorkCount (publish.CalcWorkCountRequest) returns (publish.CalcWorkCountResponse) {}
+  //关注列表
+  rpc FollowList (followlist.FollowListRequest) returns (followlist.FollowListResponse) {}
 }
