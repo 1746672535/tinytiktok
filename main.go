@@ -25,8 +25,11 @@ func main() {
 	router.GET("/douyin/publish/list/", videoWeb.PublishList)
 	// dfs
 	router.POST("/dfs/auth/", dfsAuth)
-
+	// 关注列表
 	router.GET("/douyin/relation/follow/list/", userWeb.FollowList)
+	// 粉丝列表
+	router.GET("/douyin/relation/follower/list/", userWeb.FollowerList)
+
 	_ = router.Run(":5051")
 }
 

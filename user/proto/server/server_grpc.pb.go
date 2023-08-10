@@ -12,6 +12,7 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	favorite "tinytiktok/user/proto/favorite"
+	followerlist "tinytiktok/user/proto/followerlist"
 	followlist "tinytiktok/user/proto/followlist"
 	info2 "tinytiktok/user/proto/info2"
 	login "tinytiktok/user/proto/login"
@@ -31,6 +32,7 @@ const (
 	UserService_CalcFavoriteCount_FullMethodName = "/userServer.UserService/CalcFavoriteCount"
 	UserService_CalcWorkCount_FullMethodName     = "/userServer.UserService/CalcWorkCount"
 	UserService_FollowList_FullMethodName        = "/userServer.UserService/FollowList"
+	UserService_FollowerList_FullMethodName      = "/userServer.UserService/FollowerList"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -46,6 +48,8 @@ type UserServiceClient interface {
 	CalcWorkCount(ctx context.Context, in *publish.CalcWorkCountRequest, opts ...grpc.CallOption) (*publish.CalcWorkCountResponse, error)
 	// 关注列表
 	FollowList(ctx context.Context, in *followlist.FollowListRequest, opts ...grpc.CallOption) (*followlist.FollowListResponse, error)
+	// 粉丝列表
+	FollowerList(ctx context.Context, in *followerlist.FollowerListRequest, opts ...grpc.CallOption) (*followerlist.FollowerListResponse, error)
 }
 
 type userServiceClient struct {
@@ -110,6 +114,15 @@ func (c *userServiceClient) FollowList(ctx context.Context, in *followlist.Follo
 	return out, nil
 }
 
+func (c *userServiceClient) FollowerList(ctx context.Context, in *followerlist.FollowerListRequest, opts ...grpc.CallOption) (*followerlist.FollowerListResponse, error) {
+	out := new(followerlist.FollowerListResponse)
+	err := c.cc.Invoke(ctx, UserService_FollowerList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -123,6 +136,8 @@ type UserServiceServer interface {
 	CalcWorkCount(context.Context, *publish.CalcWorkCountRequest) (*publish.CalcWorkCountResponse, error)
 	// 关注列表
 	FollowList(context.Context, *followlist.FollowListRequest) (*followlist.FollowListResponse, error)
+	// 粉丝列表
+	FollowerList(context.Context, *followerlist.FollowerListRequest) (*followerlist.FollowerListResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -147,6 +162,9 @@ func (UnimplementedUserServiceServer) CalcWorkCount(context.Context, *publish.Ca
 }
 func (UnimplementedUserServiceServer) FollowList(context.Context, *followlist.FollowListRequest) (*followlist.FollowListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FollowList not implemented")
+}
+func (UnimplementedUserServiceServer) FollowerList(context.Context, *followerlist.FollowerListRequest) (*followerlist.FollowerListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FollowerList not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -269,6 +287,24 @@ func _UserService_FollowList_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_FollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(followerlist.FollowerListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).FollowerList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_FollowerList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).FollowerList(ctx, req.(*followerlist.FollowerListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -299,6 +335,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FollowList",
 			Handler:    _UserService_FollowList_Handler,
+		},
+		{
+			MethodName: "FollowerList",
+			Handler:    _UserService_FollowerList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

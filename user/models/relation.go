@@ -21,3 +21,10 @@ func GetFollowList(db *gorm.DB, userId int64) []*Relation {
 	db.Where("userid=?", userId).Find(&relation)
 	return relation
 }
+
+// 根据id查询粉丝列表
+func GetFollowerList(db *gorm.DB, userId int64) []*Relation {
+	var relation []*Relation
+	db.Where("pid=?", userId).Find(&relation)
+	return relation
+}

@@ -7,7 +7,7 @@ import "user/info.proto";
 import "user/favorite.proto";
 import "user/publish.proto";
 import "user/followlist.proto";
-
+import "user/followerlist.proto";
 
 service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}
@@ -19,4 +19,6 @@ service UserService {
   rpc CalcWorkCount (publish.CalcWorkCountRequest) returns (publish.CalcWorkCountResponse) {}
   //关注列表
   rpc FollowList (followlist.FollowListRequest) returns (followlist.FollowListResponse) {}
+  //粉丝列表
+  rpc FollowerList (followerlist.FollowerListRequest) returns (followerlist.FollowerListResponse) {}
 }

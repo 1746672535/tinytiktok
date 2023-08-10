@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/metadata"
 	"net/http"
-	"tinytiktok/user/proto/followlist"
+	"tinytiktok/user/proto/followerlist"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/consul"
 )
 
-// FollowList 获取关注列表
-func FollowList(ctx *gin.Context) {
+// FollowerList 获取关注列表
+func FollowerList(ctx *gin.Context) {
 	// 鉴权
 	if !ctx.GetBool("auth") {
 		fmt.Println("鉴权失败")
@@ -25,7 +25,7 @@ func FollowList(ctx *gin.Context) {
 	conn := consul.GetClientConn("user-srv")
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
-	rsp, _ := client.FollowList(metadata.NewOutgoingContext(context.Background(), md), &followlist.FollowListRequest{
+	rsp, _ := client.FollowerList(metadata.NewOutgoingContext(context.Background(), md), &followerlist.FollowerListRequest{
 		UserId: userID,
 	})
 
