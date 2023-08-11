@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm"
 	"time"
+	"tinytiktok/user/models"
 	"tinytiktok/user/proto/favorite"
 	"tinytiktok/user/proto/publish"
 	"tinytiktok/user/proto/server"
@@ -166,4 +167,18 @@ func GetVideoLikesCount(db *gorm.DB, videoID int64) (int64, error) {
 		return 0, result.Error
 	}
 	return count, nil
+}
+
+// IsFavorite 查询该用户是否被作者关注
+func IsFavorite(db *gorm.DB, userId, authorId int64) bool {
+	var user models.Relation
+	result := db.Where("userid=? and pid=?", userId, authorId).First(&user)
+	if result.Error != nil {
+		return false
+	}
+	// 没找到
+	if result.RowsAffected == 0 {
+		return false
+	}
+	return true
 }

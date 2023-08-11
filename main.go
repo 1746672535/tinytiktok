@@ -29,7 +29,8 @@ func main() {
 	router.GET("/douyin/relation/follow/list/", userWeb.FollowList)
 	// 粉丝列表
 	router.GET("/douyin/relation/follower/list/", userWeb.FollowerList)
-
+	// 关注操作
+	router.POST("/douyin/relation/action/", userWeb.Favorite)
 	_ = router.Run(":5051")
 }
 

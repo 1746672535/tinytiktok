@@ -15,6 +15,7 @@ type User struct {
 	Salt           string `gorm:"column:salt" json:"-"`
 	FollowCount    int64  `gorm:"column:follow_count" json:"follow_count"`
 	FollowerCount  int64  `gorm:"column:follower_count" json:"follower_count"`
+	IsFollow       bool   `gorm:"column:is_follow" json:"is_follow"`
 	Avatar         string `gorm:"column:avatar" json:"avatar"`
 	BackgroundImg  string `gorm:"column:background_image" json:"background_image"`
 	Signature      string `gorm:"column:signature" json:"signature"`
@@ -34,6 +35,23 @@ func GetUserInfo(db *gorm.DB, userID int64) (*User, error) {
 	result := db.Where("id = ?", userID).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
+	}
+	// 将用户信息返回
+	return &user, nil
+}
+
+// GetUserInfoF 获取用户粉丝关注列表用户
+func GetUserInfoF(db *gorm.DB, db1 *gorm.DB, userID int64) (*User, error) {
+	// 根据用户 Name 查询用户
+	var user User
+	result := db.Where("id = ?", userID).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = db1.Where("userid=? and pid=?", userID, user.ID)
+	if result.Error != nil {
+		user.IsFollow = false
+		return &user, nil
 	}
 	// 将用户信息返回
 	return &user, nil
@@ -116,4 +134,16 @@ func CalcWorkCountByUserID(db *gorm.DB, userID int64, isPublish bool) error {
 		return err
 	}
 	return nil
+}
+
+// 获取状态
+func GetStateById(db *gorm.DB, userID, pID int64) bool {
+	var user Relation
+	if err := db.Where("userid=? and pid=?", userID, pID).First(&user); err != nil {
+		// 没找到
+		if errors.Is(err.Error, gorm.ErrRecordNotFound) {
+			return false
+		}
+	}
+	return true
 }

@@ -12,6 +12,7 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	favorite "tinytiktok/user/proto/favorite"
+	favorite2 "tinytiktok/user/proto/favorite2"
 	followerlist "tinytiktok/user/proto/followerlist"
 	followlist "tinytiktok/user/proto/followlist"
 	info2 "tinytiktok/user/proto/info2"
@@ -33,6 +34,7 @@ const (
 	UserService_CalcWorkCount_FullMethodName     = "/userServer.UserService/CalcWorkCount"
 	UserService_FollowList_FullMethodName        = "/userServer.UserService/FollowList"
 	UserService_FollowerList_FullMethodName      = "/userServer.UserService/FollowerList"
+	UserService_Favorite_FullMethodName          = "/userServer.UserService/Favorite"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -50,6 +52,8 @@ type UserServiceClient interface {
 	FollowList(ctx context.Context, in *followlist.FollowListRequest, opts ...grpc.CallOption) (*followlist.FollowListResponse, error)
 	// 粉丝列表
 	FollowerList(ctx context.Context, in *followerlist.FollowerListRequest, opts ...grpc.CallOption) (*followerlist.FollowerListResponse, error)
+	// 关注操作
+	Favorite(ctx context.Context, in *favorite2.FavoriteRequest, opts ...grpc.CallOption) (*favorite2.FavoriteResponse, error)
 }
 
 type userServiceClient struct {
@@ -123,6 +127,15 @@ func (c *userServiceClient) FollowerList(ctx context.Context, in *followerlist.F
 	return out, nil
 }
 
+func (c *userServiceClient) Favorite(ctx context.Context, in *favorite2.FavoriteRequest, opts ...grpc.CallOption) (*favorite2.FavoriteResponse, error) {
+	out := new(favorite2.FavoriteResponse)
+	err := c.cc.Invoke(ctx, UserService_Favorite_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -138,6 +151,8 @@ type UserServiceServer interface {
 	FollowList(context.Context, *followlist.FollowListRequest) (*followlist.FollowListResponse, error)
 	// 粉丝列表
 	FollowerList(context.Context, *followerlist.FollowerListRequest) (*followerlist.FollowerListResponse, error)
+	// 关注操作
+	Favorite(context.Context, *favorite2.FavoriteRequest) (*favorite2.FavoriteResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -165,6 +180,9 @@ func (UnimplementedUserServiceServer) FollowList(context.Context, *followlist.Fo
 }
 func (UnimplementedUserServiceServer) FollowerList(context.Context, *followerlist.FollowerListRequest) (*followerlist.FollowerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FollowerList not implemented")
+}
+func (UnimplementedUserServiceServer) Favorite(context.Context, *favorite2.FavoriteRequest) (*favorite2.FavoriteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Favorite not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -305,6 +323,24 @@ func _UserService_FollowerList_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_Favorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(favorite2.FavoriteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Favorite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_Favorite_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Favorite(ctx, req.(*favorite2.FavoriteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -339,6 +375,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FollowerList",
 			Handler:    _UserService_FollowerList_Handler,
+		},
+		{
+			MethodName: "Favorite",
+			Handler:    _UserService_Favorite_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

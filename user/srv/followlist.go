@@ -12,15 +12,17 @@ func (h *Handle) FollowList(ctx context.Context, req *followlist.FollowListReque
 	users := models.GetFollowList(RelationDb, req.UserId)
 	var userList []*info2.User
 	for _, v := range users {
-		user, err := models.GetUserInfo(UserDb, v.PID)
+		user, err := models.GetUserInfoF(UserDb, RelationDb, v.PID)
 		if err != nil {
 			continue
 		}
+		// State := models.GetStateById(RelationDb, req.UserId, user.ID)
 		userList = append(userList, &info2.User{
 			Id:              user.ID,
 			Name:            user.Name,
 			FollowCount:     user.FollowCount,
 			FollowerCount:   user.FollowerCount,
+			IsFollow:        true,
 			Avatar:          user.Avatar,
 			BackgroundImage: user.BackgroundImg,
 			Signature:       user.Signature,

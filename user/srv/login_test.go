@@ -12,8 +12,8 @@ func TestLogin(t *testing.T) {
 	ctx := context.Background()
 	// 构造一个注册请求对象
 	req := &login.LoginRequest{
-		Username: "user01",
-		Password: "password",
+		Username: "2@qq.com",
+		Password: "222222",
 	}
 	// 创建一个 Handle 对象
 	h := &Handle{}

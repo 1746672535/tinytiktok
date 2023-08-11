@@ -2,6 +2,7 @@ package srv
 
 import (
 	"context"
+	"tinytiktok/user/srv"
 	"tinytiktok/video/models"
 	"tinytiktok/video/proto/feed"
 	"tinytiktok/video/proto/video"
@@ -19,6 +20,13 @@ func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.Fee
 		if err != nil {
 			continue
 		}
+		// 查询该用户是否被作者关注
+		if req.UserId == author.Id {
+			author.IsFollow = true
+		} else {
+			author.IsFollow = models.IsFavorite(srv.RelationDb, req.UserId, author.Id)
+		}
+
 		// 查询该视频是否被该用户点赞
 		like := false
 		if req.UserId != 0 {
