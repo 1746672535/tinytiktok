@@ -10,14 +10,14 @@ import (
 
 func (h *Handle) FollowerList(ctx context.Context, req *followerlist.FollowerListRequest) (rsp *followerlist.FollowerListResponse, err error) {
 	rsp = &followerlist.FollowerListResponse{}
-	users := models.GetFollowerList(RelationDb, req.UserId)
+	users := models.GetFollowerList(UserDb, req.UserId)
 	var userList []*info2.User
 	for _, v := range users {
-		user, err := models.GetUserInfoF(UserDb, RelationDb, v.UserID)
+		user, err := models.GetUserInfoF(UserDb, v.UserID)
 		if err != nil {
 			continue
 		}
-		State := models.GetStateById(RelationDb, req.UserId, user.ID)
+		State := models.GetStateById(UserDb, req.UserId, user.ID)
 		userList = append(userList, &info2.User{
 			Id:              user.ID,
 			Name:            user.Name,

@@ -12,8 +12,6 @@ import (
 
 var UserDb *gorm.DB
 
-var RelationDb *gorm.DB
-
 type Handle struct {
 	server.UnimplementedUserServiceServer
 }
@@ -34,18 +32,6 @@ func init() {
 	if err != nil {
 		panic("数据库连接失败: " + err.Error())
 	}
-	// 读取配置
-	address = dbConfig.ReadString("Relation.Address")
-	port = dbConfig.ReadInt("Relation.Port")
-	username = dbConfig.ReadString("Relation.Username")
-	password = dbConfig.ReadString("Relation.Password")
-	dbName = dbConfig.ReadString("Relation.Dbname")
-	dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, address, port, dbName)
-
-	RelationDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("数据库连接失败: " + err.Error())
-	}
 	// 生成表
 	Migrate()
 }
@@ -55,7 +41,7 @@ func Migrate() {
 	if err != nil {
 		panic("无法创建或迁移表")
 	}
-	err = RelationDb.AutoMigrate(&models.Relation{})
+	err = UserDb.AutoMigrate(&models.Relation{})
 	if err != nil {
 		panic("无法创建或迁移表")
 	}

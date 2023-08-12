@@ -14,7 +14,7 @@ var VideoServer string
 
 func init() {
 	path := os.Getenv("APP")
-	cfg := config.NewConfig(fmt.Sprintf("%s/config", path), "mysql.yaml", "yaml")
+	cfg := config.NewConfig(fmt.Sprintf("%s/config", path), "server.yaml", "yaml")
 	UserServer = cfg.ReadString("User.Name")
 	VideoServer = cfg.ReadString("Video.Name")
 }

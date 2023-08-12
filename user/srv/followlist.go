@@ -10,10 +10,10 @@ import (
 
 func (h *Handle) FollowList(ctx context.Context, req *followlist.FollowListRequest) (rsp *followlist.FollowListResponse, err error) {
 	rsp = &followlist.FollowListResponse{}
-	users := models.GetFollowList(RelationDb, req.UserId)
+	users := models.GetFollowList(UserDb, req.UserId)
 	var userList []*info2.User
 	for _, v := range users {
-		user, err := models.GetUserInfoF(UserDb, RelationDb, v.PID)
+		user, err := models.GetUserInfoF(UserDb, v.PID)
 		if err != nil {
 			continue
 		}

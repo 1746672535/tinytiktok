@@ -25,7 +25,7 @@ func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.Fee
 		if req.UserId == author.Id {
 			author.IsFollow = true
 		} else {
-			author.IsFollow = models.IsFavorite(srv.RelationDb, req.UserId, author.Id)
+			author.IsFollow = models.IsFavorite(srv.UserDb, req.UserId, author.Id)
 		}
 
 		// 查询该视频是否被该用户点赞

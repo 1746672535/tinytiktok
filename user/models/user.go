@@ -41,14 +41,15 @@ func GetUserInfo(db *gorm.DB, userID int64) (*User, error) {
 }
 
 // GetUserInfoF 获取用户粉丝关注列表用户
-func GetUserInfoF(db *gorm.DB, db1 *gorm.DB, userID int64) (*User, error) {
+func GetUserInfoF(db *gorm.DB, userID int64) (*User, error) {
 	// 根据用户 Name 查询用户
 	var user User
+	var relation Relation
 	result := db.Where("id = ?", userID).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	result = db1.Where("userid=? and pid=?", userID, user.ID)
+	result = db.Where("userid=? and pid=?", userID, user.ID).First(&relation)
 	if result.Error != nil {
 		user.IsFollow = false
 		return &user, nil

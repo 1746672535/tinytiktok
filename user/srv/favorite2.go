@@ -11,9 +11,9 @@ func (h *Handle) Favorite(ctx context.Context, req *favorite2.FavoriteRequest) (
 	rsp = &favorite2.FavoriteResponse{}
 	// 1 : 关注  2 : 取消关注
 	isFavorite := req.ActionType == 1
-	err = models.FavoriteAction(RelationDb, req.UserId, req.ToUserId, isFavorite)
+	err = models.FavoriteAction(UserDb, req.UserId, req.ToUserId, isFavorite)
 	if err != nil {
-		rsp.StatusCode = 1
+		rsp.StatusCode = msg.Fail
 		rsp.StatusMsg = err.Error()
 		return rsp, nil
 	}
