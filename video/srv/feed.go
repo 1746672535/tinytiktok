@@ -3,6 +3,7 @@ package srv
 import (
 	"context"
 	"tinytiktok/user/srv"
+	"tinytiktok/utils/msg"
 	"tinytiktok/video/models"
 	"tinytiktok/video/proto/feed"
 	"tinytiktok/video/proto/video"
@@ -53,11 +54,13 @@ func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.Fee
 			// 该用户是否点赞
 			IsFavorite: like,
 			Title:      v.Title,
+			// 视频的返回时间
+			CreateTime: v.CreatedAt.UnixMilli(),
 		})
 	}
 	// 2. 返回数据
-	rsp.StatusMsg = "ok"
-	rsp.StatusCode = 0
+	rsp.StatusMsg = msg.Ok
+	rsp.StatusCode = msg.Success
 	rsp.VideoList = videoList
 	return rsp, nil
 }

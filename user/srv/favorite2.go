@@ -4,6 +4,7 @@ import (
 	"context"
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/favorite2"
+	"tinytiktok/utils/msg"
 )
 
 func (h *Handle) Favorite(ctx context.Context, req *favorite2.FavoriteRequest) (rsp *favorite2.FavoriteResponse, err error) {
@@ -18,7 +19,7 @@ func (h *Handle) Favorite(ctx context.Context, req *favorite2.FavoriteRequest) (
 	}
 	// 操作成功，对粉丝数和关注数修改
 	models.UpdateCount(UserDb, req.UserId, req.ToUserId, isFavorite)
-	rsp.StatusCode = 0
-	rsp.StatusMsg = "ok"
+	rsp.StatusCode = msg.Success
+	rsp.StatusMsg = msg.Ok
 	return rsp, nil
 }

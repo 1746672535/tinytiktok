@@ -6,8 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/metadata"
 	"net/http"
+	"tinytiktok/common"
 	"tinytiktok/utils/consul"
 	"tinytiktok/utils/dfs"
+	"tinytiktok/utils/msg"
 	"tinytiktok/video/proto/publish"
 	"tinytiktok/video/proto/server"
 )
@@ -44,18 +46,26 @@ func Publish(ctx *gin.Context) {
 func PublishList(ctx *gin.Context) {
 	// 鉴权
 	if !ctx.GetBool("auth") {
+		common.ReturnErr(ctx, msg.AuthError)
 		return
 	}
-	// 如果鉴权成功, 可以从ctx里面拿到用户id
+
+	// 获取参数
 	userID := ctx.GetInt64("userID")
+
 	// 将请求转发到srv层
 	md := metadata.Pairs()
 	conn := consul.GetClientConn("video-srv")
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
-	rsp, _ := client.PublishList(metadata.NewOutgoingContext(context.Background(), md), &publish.PublishListRequest{
+	rsp, err := client.PublishList(metadata.NewOutgoingContext(context.Background(), md), &publish.PublishListRequest{
 		UserId: userID,
 	})
+	if err != nil {
+		common.ReturnErr(ctx, msg.ServerError)
+	}
+
+	// 返回
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": rsp.StatusCode,
 		"status_msg":  rsp.StatusMsg,

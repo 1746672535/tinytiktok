@@ -5,6 +5,7 @@ import (
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/followerlist"
 	"tinytiktok/user/proto/info2"
+	"tinytiktok/utils/msg"
 )
 
 func (h *Handle) FollowerList(ctx context.Context, req *followerlist.FollowerListRequest) (rsp *followerlist.FollowerListResponse, err error) {
@@ -31,8 +32,8 @@ func (h *Handle) FollowerList(ctx context.Context, req *followerlist.FollowerLis
 			FavoriteCount:   user.FavoriteCount,
 		})
 	}
-	rsp.StatusCode = 0
-	rsp.StatusMsg = "ok"
+	rsp.StatusCode = msg.Success
+	rsp.StatusMsg = msg.Ok
 	rsp.UserList = userList
 	return rsp, nil
 }

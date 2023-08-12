@@ -47,7 +47,7 @@ type Registry struct {
 
 func NewRegistry(address string, port int) *Registry {
 	r := &Registry{Config: api.Config{
-		//Token:   token,
+		// Token:   token,
 		Address: fmt.Sprintf("%s:%d", address, port),
 	}}
 	return r
@@ -59,7 +59,7 @@ func (r *Registry) Register(server *Server) error {
 	if err != nil {
 		return err
 	}
-	//生成注册对象
+	// 生成注册对象
 	registration := api.AgentServiceRegistration{
 		Name:    server.Name,
 		ID:      server.ID,

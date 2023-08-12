@@ -2,6 +2,7 @@ package srv
 
 import (
 	"context"
+	"tinytiktok/utils/msg"
 	"tinytiktok/video/models"
 	"tinytiktok/video/proto/favorite"
 	"tinytiktok/video/proto/video"
@@ -10,8 +11,6 @@ import (
 func (h *Handle) FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest) (rsp *favorite.FavoriteListResponse, err error) {
 	rsp = &favorite.FavoriteListResponse{}
 	videoList, _ := models.GetUserFavoriteVideoList(VideoDb, req.UserId)
-	rsp.StatusCode = 0
-	rsp.StatusMsg = "ok"
 	var videos []*video.Video
 	for _, v := range videoList {
 		// 查询视频作者信息
@@ -30,6 +29,10 @@ func (h *Handle) FavoriteList(ctx context.Context, req *favorite.FavoriteListReq
 			Title:         v.Title,
 		})
 	}
+
+	// 返回结果
+	rsp.StatusCode = msg.Success
+	rsp.StatusMsg = msg.Ok
 	rsp.VideoList = videos
 	return rsp, nil
 }

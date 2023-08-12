@@ -4,6 +4,7 @@ import (
 	"context"
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/login"
+	"tinytiktok/utils/msg"
 )
 
 // Login 用户登录
@@ -13,9 +14,10 @@ func (h *Handle) Login(ctx context.Context, req *login.LoginRequest) (rsp *login
 		return nil, err
 	}
 	// 返回信息
-	rsp = &login.LoginResponse{}
-	rsp.UserId = userID
-	rsp.StatusCode = 0
-	rsp.StatusMsg = "ok"
+	rsp = &login.LoginResponse{
+		StatusCode: msg.Success,
+		StatusMsg:  msg.Ok,
+		UserId:     userID,
+	}
 	return rsp, nil
 }

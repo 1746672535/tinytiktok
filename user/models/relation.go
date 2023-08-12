@@ -7,8 +7,8 @@ import (
 type Relation struct {
 	gorm.Model
 	ID     int64 `gorm:"column:id" json:"id"`
-	UserID int64 `gorm:"column:userid" json:"userid"` //自己
-	PID    int64 `gorm:"column:pid" json:"pid"`       //好友
+	UserID int64 `gorm:"column:userid" json:"userid"` // 自己
+	PID    int64 `gorm:"column:pid" json:"pid"`       // 好友
 }
 
 func (table *Relation) TableName() string {

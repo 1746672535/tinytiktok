@@ -2,9 +2,9 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 	"tinytiktok/utils/tools"
+	"tinytiktok/utils/yiyan"
 )
 
 type User struct {
@@ -86,7 +86,7 @@ func InsertUser(db *gorm.DB, username, password string) (int64, error) {
 		FollowerCount:  0,
 		Avatar:         "https://example.com/avatar.png",
 		BackgroundImg:  "https://example.com/background.png",
-		Signature:      fmt.Sprintf("Name: %s", username),
+		Signature:      yiyan.GenYiYan(),
 		TotalFavorited: 0,
 		WorkCount:      0,
 		FavoriteCount:  0,

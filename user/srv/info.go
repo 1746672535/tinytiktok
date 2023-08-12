@@ -4,6 +4,7 @@ import (
 	"context"
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/info2"
+	"tinytiktok/utils/msg"
 )
 
 // Info 用户登录
@@ -13,7 +14,10 @@ func (h *Handle) Info(ctx context.Context, req *info2.UserRequest) (rsp *info2.U
 		return nil, err
 	}
 	// 返回信息
-	rsp = &info2.UserResponse{}
+	rsp = &info2.UserResponse{
+		StatusMsg:  msg.Ok,
+		StatusCode: msg.Success,
+	}
 	rsp.User = &info2.User{
 		Id:              user.ID,
 		Name:            user.Name,
@@ -28,7 +32,5 @@ func (h *Handle) Info(ctx context.Context, req *info2.UserRequest) (rsp *info2.U
 		// TODO 数据库暂未配置
 		IsFollow: true,
 	}
-	rsp.StatusCode = 0
-	rsp.StatusMsg = "ok"
 	return rsp, nil
 }

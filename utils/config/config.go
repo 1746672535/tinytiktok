@@ -11,13 +11,13 @@ type Config struct {
 // NewConfig 初始化配置
 func NewConfig(path, name, ty string) *Config {
 	v := viper.New()
-	//设置读取的文件路径
+	// 设置读取的文件路径
 	v.AddConfigPath(path)
-	//设置读取的文件名
+	// 设置读取的文件名
 	v.SetConfigName(name)
-	//设置文件的类型
+	// 设置文件的类型
 	v.SetConfigType(ty)
-	//尝试进行配置读取
+	// 尝试进行配置读取
 	err := v.ReadInConfig()
 	if err != nil {
 		panic("配置读取失败: " + err.Error())

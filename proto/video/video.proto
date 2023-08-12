@@ -12,4 +12,5 @@ message Video {
   int64 comment_count = 6; // 视频的评论总数
   bool is_favorite = 7; // true-已点赞，false-未点赞
   string title = 8; // 视频标题
+  int64 create_time = 9; // 视频的创建时间[用户的上传时间]
 }
