@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.24.0--rc1
-// source: user/favorite2.proto
+// source: user/focus.proto
 
 package favorite2
 

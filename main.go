@@ -31,6 +31,8 @@ func main() {
 	router.GET("/douyin/relation/follower/list/", userWeb.FollowerList)
 	// 关注操作
 	router.POST("/douyin/relation/action/", userWeb.Favorite)
+	// 好友列表
+	router.GET("/douyin/relation/friend/list/", userWeb.FriendList)
 	_ = router.Run(":5051")
 }
 

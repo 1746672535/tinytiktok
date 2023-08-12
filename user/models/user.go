@@ -40,19 +40,14 @@ func GetUserInfo(db *gorm.DB, userID int64) (*User, error) {
 	return &user, nil
 }
 
-// GetUserInfoF 获取用户粉丝关注列表用户
-func GetUserInfoF(db *gorm.DB, userID int64) (*User, error) {
+// GetUserInfoF 获取用户粉丝/关注列表用户
+func GetUserInfoF(db *gorm.DB, userID, pID int64) (*User, error) {
 	// 根据用户 Name 查询用户
 	var user User
-	var relation Relation
-	result := db.Where("id = ?", userID).First(&user)
+	// 查找该粉丝的信息
+	result := db.Where("id = ?", pID).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
-	}
-	result = db.Where("userid=? and pid=?", userID, user.ID).First(&relation)
-	if result.Error != nil {
-		user.IsFollow = false
-		return &user, nil
 	}
 	// 将用户信息返回
 	return &user, nil
@@ -135,16 +130,4 @@ func CalcWorkCountByUserID(db *gorm.DB, userID int64, isPublish bool) error {
 		return err
 	}
 	return nil
-}
-
-// 获取状态
-func GetStateById(db *gorm.DB, userID, pID int64) bool {
-	var user Relation
-	if err := db.Where("userid=? and pid=?", userID, pID).First(&user); err != nil {
-		// 没找到
-		if errors.Is(err.Error, gorm.ErrRecordNotFound) {
-			return false
-		}
-	}
-	return true
 }

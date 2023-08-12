@@ -8,7 +8,8 @@ import "user/favorite.proto";
 import "user/publish.proto";
 import "user/followlist.proto";
 import "user/followerlist.proto";
-import "user/favorite2.proto";
+import "user/focus.proto";
+import "user/friendlist.proto";
 
 service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}
@@ -24,4 +25,6 @@ service UserService {
   rpc FollowerList (followerlist.FollowerListRequest) returns (followerlist.FollowerListResponse) {}
   // 关注操作
   rpc Favorite (favorite2.FavoriteRequest) returns (favorite2.FavoriteResponse);
+  // 好友列表
+  rpc FriendList (friendlist.FriendListRequest) returns (friendlist.FriendListResponse);
 }

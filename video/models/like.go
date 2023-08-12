@@ -161,7 +161,7 @@ func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
 // GetVideoLikesCount 获取视频点赞数量
 func GetVideoLikesCount(db *gorm.DB, videoID int64) (int64, error) {
 	var count int64
-	result := db.Model(&Like{}).Where("video_id = ? AND state = ?", videoID, true).Count(&count)
+	result := db.Model(&Like{}).Where("video_id = ? AND state = 1", videoID).Count(&count)
 	if result.Error != nil {
 		// 查询出错
 		return 0, result.Error
@@ -172,7 +172,7 @@ func GetVideoLikesCount(db *gorm.DB, videoID int64) (int64, error) {
 // IsFavorite 查询该用户是否被作者关注
 func IsFavorite(db *gorm.DB, userId, authorId int64) bool {
 	var user models.Relation
-	result := db.Where("userid=? and pid=?", userId, authorId).First(&user)
+	result := db.Where("userid=? and pid=? and state =1 ", userId, authorId).First(&user)
 	if result.Error != nil {
 		return false
 	}

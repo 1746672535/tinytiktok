@@ -9,17 +9,18 @@ import (
 // FavoriteAction 关注操作
 func FavoriteAction(db *gorm.DB, userId, toUserId int64, isFavorite bool) error {
 	var relation Relation
-	result := db.Where("userid=? and pid=?", userId, toUserId).First(&relation)
+	result := db.Where("userid=? and pid=? ", userId, toUserId).First(&relation)
 	if result.Error != nil {
 		// 查询出错
 		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return result.Error
 		}
-		// 记录不存在，创造新记录
+		// 记录不存在，关注-》创造新记录，取消关注-》返回错误
 		if isFavorite { // 关注操作
 			relation = Relation{
 				UserID: userId,
 				PID:    toUserId,
+				State:  true,
 			}
 			result = db.Create(&relation)
 			if result.Error != nil {
@@ -27,17 +28,29 @@ func FavoriteAction(db *gorm.DB, userId, toUserId int64, isFavorite bool) error 
 				return result.Error
 			}
 			return nil
+		} else {
+			return errors.New("未关注，不存在取消关注操作")
 		}
 	}
-
+	// 有数据 + 关注操作
 	if isFavorite {
 		// 重复关注
-		return errors.New("repeat favorite")
-	} else {
+		if relation.State {
+			return errors.New("repeat favorite")
+		}
+		// 关注
+		relation.State = true
+		result = db.Save(&relation)
+
+	} else { // 有数据 + 取消关注
 		// 取消关注操作
-		db.Delete(&relation)
-		return nil
+		relation.State = false
+		result = db.Save(&relation)
+		if result.Error != nil {
+			return result.Error
+		}
 	}
+	return nil
 }
 
 // UpdateCount 更新关注/粉丝数

@@ -1,6 +1,6 @@
 syntax = "proto3";
-package favorite2;
-option go_package = "tinytiktok/user/proto/favorite2";
+package focus;
+option go_package = "tinytiktok/user/proto/focus";
 
 // 关注请求
 message FavoriteRequest {

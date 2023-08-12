@@ -7,6 +7,7 @@ import (
 	"tinytiktok/utils/msg"
 )
 
+// Favorite 关注/取消关注 操作
 func (h *Handle) Favorite(ctx context.Context, req *favorite2.FavoriteRequest) (rsp *favorite2.FavoriteResponse, err error) {
 	rsp = &favorite2.FavoriteResponse{}
 	// 1 : 关注  2 : 取消关注

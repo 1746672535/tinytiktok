@@ -2,20 +2,21 @@ package web
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/metadata"
 	"net/http"
 	"strconv"
+	"tinytiktok/common"
 	"tinytiktok/user/proto/favorite2"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/consul"
+	"tinytiktok/utils/msg"
 )
 
 func Favorite(ctx *gin.Context) {
 	// 鉴权
 	if !ctx.GetBool("auth") {
-		fmt.Println("鉴权失败")
+		common.ReturnErr(ctx, msg.ServerError)
 		return
 	}
 	// 如果鉴权成功, 可以从ctx里面拿到自己id，对方id，和操作类型

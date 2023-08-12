@@ -10,10 +10,12 @@ import (
 
 func (h *Handle) FollowList(ctx context.Context, req *followlist.FollowListRequest) (rsp *followlist.FollowListResponse, err error) {
 	rsp = &followlist.FollowListResponse{}
+	// 获取用户的关注列表
 	users := models.GetFollowList(UserDb, req.UserId)
 	var userList []*info2.User
 	for _, v := range users {
-		user, err := models.GetUserInfoF(UserDb, v.PID)
+		// 获取用户关注列表的用户的具体信息
+		user, err := models.GetUserInfoF(UserDb, req.UserId, v.PID)
 		if err != nil {
 			continue
 		}
