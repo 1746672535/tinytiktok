@@ -43,10 +43,17 @@ func Feed(ctx *gin.Context) {
 	}
 
 	// 返回结果
+	var nextTime int64
+	// 视频长度为0表示数据库的视频已经全部返回给app, 所以将时间重置为0[从头开始刷新], 并宣布此次返回
+	if len(rsp.VideoList) == 0 {
+		nextTime = 0
+	} else {
+		nextTime = rsp.VideoList[len(rsp.VideoList)-1].CreateTime
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": msg.Success,
 		"status_msg":  msg.Ok,
-		"next_time":   rsp.VideoList[len(rsp.VideoList)-1].CreateTime,
+		"next_time":   nextTime,
 		"video_list":  rsp.VideoList,
 	},
 	)

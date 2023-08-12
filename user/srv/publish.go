@@ -4,6 +4,7 @@ import (
 	"context"
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/publish"
+	"tinytiktok/utils/msg"
 )
 
 func (h *Handle) CalcWorkCount(ctx context.Context, req *publish.CalcWorkCountRequest) (rsp *publish.CalcWorkCountResponse, err error) {
@@ -12,7 +13,7 @@ func (h *Handle) CalcWorkCount(ctx context.Context, req *publish.CalcWorkCountRe
 		return nil, err
 	}
 	rsp = &publish.CalcWorkCountResponse{}
-	rsp.StatusCode = 0
-	rsp.StatusMsg = "ok"
+	rsp.StatusCode = msg.Success
+	rsp.StatusMsg = msg.Ok
 	return rsp, nil
 }
