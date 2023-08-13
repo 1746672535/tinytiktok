@@ -5,7 +5,7 @@ import "video/feed.proto";
 import "video/like.proto";
 import "video/favorite.proto";
 import "video/publish.proto";
-
+import "video/detail.proto";
 
 service VideoService {
   // 返回最近30条视频信息[最多]
@@ -16,5 +16,8 @@ service VideoService {
   rpc FavoriteList (favorite.FavoriteListRequest) returns (favorite.FavoriteListResponse) {}
   // 用户发布视频实现
   rpc Publish (publish.PublishRequest) returns (publish.PublishResponse) {}
+  // 发布列表
   rpc PublishList (publish.PublishListRequest) returns (publish.PublishListResponse) {}
+  // 用户的视频详细信息
+  rpc Detail (detail.DetailRequest) returns (detail.DetailResponse) {}
 }

@@ -16,7 +16,7 @@ message FriendListResponse {
 
 
 message FriendUser {
-    info.User user = 1;    // 基础用户信息
-    string message = 2; // 和该好友的最新聊天消息
-    int64 msgType = 3; // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
+  info.User user = 1;    // 基础用户信息
+  string message = 2; // 和该好友的最新聊天消息
+  int64 msgType = 3; // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
 }

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"tinytiktok/common"
-	"tinytiktok/user/proto/favorite2"
+	"tinytiktok/user/proto/focus"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/consul"
 	"tinytiktok/utils/msg"
@@ -30,7 +30,7 @@ func Favorite(ctx *gin.Context) {
 	defer conn.Close()
 
 	client := server.NewUserServiceClient(conn)
-	rsp, _ := client.Favorite(metadata.NewOutgoingContext(context.Background(), md), &favorite2.FavoriteRequest{
+	rsp, _ := client.Favorite(metadata.NewOutgoingContext(context.Background(), md), &focus.FavoriteRequest{
 		UserId:     userId,
 		ToUserId:   int64(toUserId),
 		ActionType: int32(actionType),

@@ -15,7 +15,7 @@ func (h *Handle) FollowList(ctx context.Context, req *followlist.FollowListReque
 	var userList []*info2.User
 	for _, v := range users {
 		// 获取用户关注列表的用户的具体信息
-		user, err := models.GetUserInfoF(UserDb, req.UserId, v.PID)
+		user, err := models.GetUserInfo(UserDb, v.PID)
 		if err != nil {
 			continue
 		}

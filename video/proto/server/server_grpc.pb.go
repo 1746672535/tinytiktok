@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	detail "tinytiktok/video/proto/detail"
 	favorite "tinytiktok/video/proto/favorite"
 	feed "tinytiktok/video/proto/feed"
 	like "tinytiktok/video/proto/like"
@@ -28,6 +29,7 @@ const (
 	VideoService_FavoriteList_FullMethodName = "/userServer.VideoService/FavoriteList"
 	VideoService_Publish_FullMethodName      = "/userServer.VideoService/Publish"
 	VideoService_PublishList_FullMethodName  = "/userServer.VideoService/PublishList"
+	VideoService_Detail_FullMethodName       = "/userServer.VideoService/Detail"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -42,7 +44,10 @@ type VideoServiceClient interface {
 	FavoriteList(ctx context.Context, in *favorite.FavoriteListRequest, opts ...grpc.CallOption) (*favorite.FavoriteListResponse, error)
 	// 用户发布视频实现
 	Publish(ctx context.Context, in *publish.PublishRequest, opts ...grpc.CallOption) (*publish.PublishResponse, error)
+	// 发布列表
 	PublishList(ctx context.Context, in *publish.PublishListRequest, opts ...grpc.CallOption) (*publish.PublishListResponse, error)
+	// 用户的视频详细信息
+	Detail(ctx context.Context, in *detail.DetailRequest, opts ...grpc.CallOption) (*detail.DetailResponse, error)
 }
 
 type videoServiceClient struct {
@@ -98,6 +103,15 @@ func (c *videoServiceClient) PublishList(ctx context.Context, in *publish.Publis
 	return out, nil
 }
 
+func (c *videoServiceClient) Detail(ctx context.Context, in *detail.DetailRequest, opts ...grpc.CallOption) (*detail.DetailResponse, error) {
+	out := new(detail.DetailResponse)
+	err := c.cc.Invoke(ctx, VideoService_Detail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
@@ -110,7 +124,10 @@ type VideoServiceServer interface {
 	FavoriteList(context.Context, *favorite.FavoriteListRequest) (*favorite.FavoriteListResponse, error)
 	// 用户发布视频实现
 	Publish(context.Context, *publish.PublishRequest) (*publish.PublishResponse, error)
+	// 发布列表
 	PublishList(context.Context, *publish.PublishListRequest) (*publish.PublishListResponse, error)
+	// 用户的视频详细信息
+	Detail(context.Context, *detail.DetailRequest) (*detail.DetailResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -132,6 +149,9 @@ func (UnimplementedVideoServiceServer) Publish(context.Context, *publish.Publish
 }
 func (UnimplementedVideoServiceServer) PublishList(context.Context, *publish.PublishListRequest) (*publish.PublishListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PublishList not implemented")
+}
+func (UnimplementedVideoServiceServer) Detail(context.Context, *detail.DetailRequest) (*detail.DetailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Detail not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -236,6 +256,24 @@ func _VideoService_PublishList_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_Detail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(detail.DetailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).Detail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_Detail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).Detail(ctx, req.(*detail.DetailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -262,6 +300,10 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublishList",
 			Handler:    _VideoService_PublishList_Handler,
+		},
+		{
+			MethodName: "Detail",
+			Handler:    _VideoService_Detail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

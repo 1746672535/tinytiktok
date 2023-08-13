@@ -1,0 +1,22 @@
+syntax = "proto3";
+package detail;
+option go_package = "tinytiktok/video/proto/detail";
+
+message Detail {
+  int64 user_id = 1; // 用户ID
+  int64 work_count = 2;  // 作品数量
+  int64 favorite_count = 3;  // 点赞数量
+  int64 total_favorited = 4; // 总点赞数量[被点赞数量]
+}
+
+// 查询用户的有关视频的具体信息 例如: 总点赞数量, 作品总数量, 被点赞数量
+message DetailRequest {
+  int64 user_id = 1; // 用户id
+  string token = 2; // 用户鉴权token
+}
+
+message DetailResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  Detail detail = 3;
+}

@@ -19,7 +19,7 @@ func (h *Handle) Publish(ctx context.Context, req *publish.PublishRequest) (rsp 
 	err = models.InsertVideo(VideoDb, v)
 
 	// 为用户的作品数量+1
-	err = models.CalcWorkCountByUserID(req.AuthorId, true)
+	err = models.CalcWorkCountByUserID(VideoDb, req.AuthorId, true)
 	if err != nil {
 		rsp.StatusCode = 1
 		rsp.StatusMsg = "not ok"

@@ -4,8 +4,6 @@ option go_package = "tinytiktok/user/proto/server";
 import "user/register.proto";
 import "user/login.proto";
 import "user/info.proto";
-import "user/favorite.proto";
-import "user/publish.proto";
 import "user/followlist.proto";
 import "user/followerlist.proto";
 import "user/focus.proto";
@@ -15,16 +13,12 @@ service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}
   rpc Login (login.LoginRequest) returns (login.LoginResponse) {}
   rpc Info (info.UserRequest) returns (info.UserResponse) {}
-  // 用户点赞或取消点赞
-  rpc CalcFavoriteCount (favorite.CalcFavoriteCountRequest) returns (favorite.CalcFavoriteCountResponse) {}
-  // 用户发表/删除视频时需要增加/减少用户的作品数量
-  rpc CalcWorkCount (publish.CalcWorkCountRequest) returns (publish.CalcWorkCountResponse) {}
   // 关注列表
   rpc FollowList (followlist.FollowListRequest) returns (followlist.FollowListResponse) {}
   // 粉丝列表
   rpc FollowerList (followerlist.FollowerListRequest) returns (followerlist.FollowerListResponse) {}
   // 关注操作
-  rpc Favorite (favorite2.FavoriteRequest) returns (favorite2.FavoriteResponse);
+  rpc Favorite (focus.FavoriteRequest) returns (focus.FavoriteResponse);
   // 好友列表
   rpc FriendList (friendlist.FriendListRequest) returns (friendlist.FriendListResponse);
 }

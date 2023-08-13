@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm"
 	"time"
+	"tinytiktok/common"
 	"tinytiktok/user/proto/info2"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/consul"
@@ -27,7 +28,7 @@ func (v Video) TableName() string {
 
 // GetUserInfo 根据id查找用户
 func GetUserInfo(userId int64) (user *info2.User, err error) {
-	conn := consul.GetClientConn("user-srv")
+	conn := consul.GetClientConn(common.UserServer)
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	// 发送请求

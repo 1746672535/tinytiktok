@@ -1,10 +1,16 @@
 package models
 
 import (
+	"context"
 	"errors"
+	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm"
+	"tinytiktok/common"
+	"tinytiktok/utils/consul"
 	"tinytiktok/utils/tools"
 	"tinytiktok/utils/yiyan"
+	"tinytiktok/video/proto/detail"
+	"tinytiktok/video/proto/server"
 )
 
 type User struct {
@@ -19,9 +25,9 @@ type User struct {
 	Avatar         string `gorm:"column:avatar" json:"avatar"`
 	BackgroundImg  string `gorm:"column:background_image" json:"background_image"`
 	Signature      string `gorm:"column:signature" json:"signature"`
-	TotalFavorited int64  `gorm:"column:total_favorited" json:"total_favorited"`
-	WorkCount      int64  `gorm:"column:work_count" json:"work_count"`
-	FavoriteCount  int64  `gorm:"column:favorite_count" json:"favorite_count"`
+	WorkCount      int64  `gorm:"-" json:"work_count"`
+	FavoriteCount  int64  `gorm:"-" json:"favorite_count"`
+	TotalFavorited int64  `gorm:"-" json:"total_favorited"`
 }
 
 func (User) TableName() string {
@@ -33,24 +39,30 @@ func GetUserInfo(db *gorm.DB, userID int64) (*User, error) {
 	// 根据用户 Name 查询用户
 	var user User
 	result := db.Where("id = ?", userID).First(&user)
-	if result.Error != nil {
+	d, err := GetDetail(userID)
+	if result.Error != nil || err != nil {
 		return nil, result.Error
 	}
+	user.WorkCount = d.WorkCount
+	user.FavoriteCount = d.FavoriteCount
+	user.TotalFavorited = d.TotalFavorited
 	// 将用户信息返回
 	return &user, nil
 }
 
-// GetUserInfoF 获取用户粉丝/关注列表用户
-func GetUserInfoF(db *gorm.DB, userID, pID int64) (*User, error) {
-	// 根据用户 Name 查询用户
-	var user User
-	// 查找该粉丝的信息
-	result := db.Where("id = ?", pID).First(&user)
-	if result.Error != nil {
-		return nil, result.Error
+// GetDetail 获取用户有关视频的详细信息
+func GetDetail(userID int64) (*detail.Detail, error) {
+	conn := consul.GetClientConn(common.VideoServer)
+	defer conn.Close()
+	client := server.NewVideoServiceClient(conn)
+	// 发送请求
+	rsp, err := client.Detail(metadata.NewOutgoingContext(context.Background(), nil), &detail.DetailRequest{
+		UserId: userID,
+	})
+	if err != nil || rsp.StatusCode != 0 {
+		return nil, err
 	}
-	// 将用户信息返回
-	return &user, nil
+	return rsp.Detail, nil
 }
 
 // LoginVerify 登录验证
@@ -92,42 +104,4 @@ func InsertUser(db *gorm.DB, username, password string) (int64, error) {
 		return -1, result.Error
 	}
 	return user.ID, nil
-}
-
-// CalcFavoriteCountByUserID 计算用户的喜欢数量
-func CalcFavoriteCountByUserID(db *gorm.DB, userID int64, isFavorite bool) error {
-	var user User
-	// 从数据库中获取对应用户的信息
-	if err := db.First(&user, userID).Error; err != nil {
-		return err
-	}
-	if isFavorite {
-		user.FavoriteCount++
-	} else {
-		user.FavoriteCount--
-	}
-	// 将修改后的User结构体保存回数据库
-	if err := db.Save(&user).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-// CalcWorkCountByUserID 计算用户的作品数量
-func CalcWorkCountByUserID(db *gorm.DB, userID int64, isPublish bool) error {
-	var user User
-	// 从数据库中获取对应用户的信息
-	if err := db.First(&user, userID).Error; err != nil {
-		return err
-	}
-	if isPublish {
-		user.WorkCount++
-	} else {
-		user.WorkCount--
-	}
-	// 将修改后的User结构体保存回数据库
-	if err := db.Save(&user).Error; err != nil {
-		return err
-	}
-	return nil
 }

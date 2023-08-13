@@ -15,7 +15,7 @@ func (h *Handle) FollowerList(ctx context.Context, req *followerlist.FollowerLis
 	var userList []*info2.User
 	for _, v := range users {
 		// 获取该用户粉丝列表的具体信息并查看是否关注了自己
-		user, err := models.GetUserInfoF(UserDb, req.UserId, v.UserID)
+		user, err := models.GetUserInfo(UserDb, v.UserID)
 		if err != nil {
 			continue
 		}
