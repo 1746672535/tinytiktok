@@ -17,6 +17,8 @@ import (
 	friendlist "tinytiktok/user/proto/friendlist"
 	info2 "tinytiktok/user/proto/info2"
 	login "tinytiktok/user/proto/login"
+	messageact "tinytiktok/user/proto/messageact"
+	messagechat "tinytiktok/user/proto/messagechat"
 	register "tinytiktok/user/proto/register"
 )
 
@@ -33,6 +35,8 @@ const (
 	UserService_FollowerList_FullMethodName = "/userServer.UserService/FollowerList"
 	UserService_Favorite_FullMethodName     = "/userServer.UserService/Favorite"
 	UserService_FriendList_FullMethodName   = "/userServer.UserService/FriendList"
+	UserService_MessageAct_FullMethodName   = "/userServer.UserService/MessageAct"
+	UserService_MassageChat_FullMethodName  = "/userServer.UserService/MassageChat"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -50,6 +54,10 @@ type UserServiceClient interface {
 	Favorite(ctx context.Context, in *focus.FavoriteRequest, opts ...grpc.CallOption) (*focus.FavoriteResponse, error)
 	// 好友列表
 	FriendList(ctx context.Context, in *friendlist.FriendListRequest, opts ...grpc.CallOption) (*friendlist.FriendListResponse, error)
+	// 发送信息
+	MessageAct(ctx context.Context, in *messageact.MessageActionRequest, opts ...grpc.CallOption) (*messageact.MessageActionResponse, error)
+	// 聊天记录
+	MassageChat(ctx context.Context, in *messagechat.MessageChatRequest, opts ...grpc.CallOption) (*messagechat.MessageChatResponse, error)
 }
 
 type userServiceClient struct {
@@ -123,6 +131,24 @@ func (c *userServiceClient) FriendList(ctx context.Context, in *friendlist.Frien
 	return out, nil
 }
 
+func (c *userServiceClient) MessageAct(ctx context.Context, in *messageact.MessageActionRequest, opts ...grpc.CallOption) (*messageact.MessageActionResponse, error) {
+	out := new(messageact.MessageActionResponse)
+	err := c.cc.Invoke(ctx, UserService_MessageAct_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) MassageChat(ctx context.Context, in *messagechat.MessageChatRequest, opts ...grpc.CallOption) (*messagechat.MessageChatResponse, error) {
+	out := new(messagechat.MessageChatResponse)
+	err := c.cc.Invoke(ctx, UserService_MassageChat_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -138,6 +164,10 @@ type UserServiceServer interface {
 	Favorite(context.Context, *focus.FavoriteRequest) (*focus.FavoriteResponse, error)
 	// 好友列表
 	FriendList(context.Context, *friendlist.FriendListRequest) (*friendlist.FriendListResponse, error)
+	// 发送信息
+	MessageAct(context.Context, *messageact.MessageActionRequest) (*messageact.MessageActionResponse, error)
+	// 聊天记录
+	MassageChat(context.Context, *messagechat.MessageChatRequest) (*messagechat.MessageChatResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -165,6 +195,12 @@ func (UnimplementedUserServiceServer) Favorite(context.Context, *focus.FavoriteR
 }
 func (UnimplementedUserServiceServer) FriendList(context.Context, *friendlist.FriendListRequest) (*friendlist.FriendListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FriendList not implemented")
+}
+func (UnimplementedUserServiceServer) MessageAct(context.Context, *messageact.MessageActionRequest) (*messageact.MessageActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MessageAct not implemented")
+}
+func (UnimplementedUserServiceServer) MassageChat(context.Context, *messagechat.MessageChatRequest) (*messagechat.MessageChatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MassageChat not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -305,6 +341,42 @@ func _UserService_FriendList_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_MessageAct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(messageact.MessageActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).MessageAct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_MessageAct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).MessageAct(ctx, req.(*messageact.MessageActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_MassageChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(messagechat.MessageChatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).MassageChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_MassageChat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).MassageChat(ctx, req.(*messagechat.MessageChatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -339,6 +411,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FriendList",
 			Handler:    _UserService_FriendList_Handler,
+		},
+		{
+			MethodName: "MessageAct",
+			Handler:    _UserService_MessageAct_Handler,
+		},
+		{
+			MethodName: "MassageChat",
+			Handler:    _UserService_MassageChat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

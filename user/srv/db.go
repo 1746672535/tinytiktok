@@ -34,6 +34,7 @@ func init() {
 	}
 	// 生成表
 	Migrate()
+	err = UserDb.AutoMigrate(&models.Message{})
 }
 
 func Migrate() {

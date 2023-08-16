@@ -35,9 +35,9 @@ func main() {
 	router.GET("/douyin/relation/friend/list/", userWeb.FriendList)
 
 	//发送信息
-	router.GET("/douyin/message/action/", userWeb.MessageAct)
+	router.POST("/douyin/message/action/", userWeb.MessageAct)
 	//聊天记录
-	router.POST("/douyin/message/chat/", userWeb.MessageChat)
+	router.GET("/douyin/message/chat/", userWeb.MessageChat)
 
 	_ = router.Run(":5051")
 }

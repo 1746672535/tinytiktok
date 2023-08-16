@@ -12,7 +12,18 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 	rsp := friendlist.FriendListResponse{}
 	users := models.GetFriendList(UserDb, req.UserId)
 	var friendList []*friendlist.FriendUser
+
+	// Get the MessageService instance
+	messageService := GetMessageServiceInstance()
+
 	for _, v := range users {
+		// Get the latest message info for the user
+		messageInfo, err := messageService.LatestMessage(req.UserId, v.ID)
+		// In case of an error, skip and continue to the next user
+		if err != nil {
+			continue
+		}
+
 		friendList = append(friendList, &friendlist.FriendUser{
 			User: &info2.User{
 				Id:              v.ID,
@@ -27,8 +38,8 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 				WorkCount:       v.WorkCount,
 				FavoriteCount:   v.FavoriteCount,
 			},
-			Message: "开发中",
-			MsgType: 0,
+			Message: messageInfo.message, // Set the message content
+			MsgType: messageInfo.msgType, // Set the message type
 		})
 	}
 	rsp.UserList = friendList

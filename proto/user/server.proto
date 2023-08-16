@@ -8,6 +8,8 @@ import "user/followlist.proto";
 import "user/followerlist.proto";
 import "user/focus.proto";
 import "user/friendlist.proto";
+import "user/messageact.proto";
+import "user/messagechat.proto";
 
 service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}
@@ -21,4 +23,8 @@ service UserService {
   rpc Favorite (focus.FavoriteRequest) returns (focus.FavoriteResponse);
   // 好友列表
   rpc FriendList (friendlist.FriendListRequest) returns (friendlist.FriendListResponse);
+  //发送信息
+  rpc MessageAct (messageact.MessageActionRequest) returns (messageact.MessageActionResponse);
+  //聊天记录
+  rpc MassageChat (messagechat.MessageChatRequest) returns (messagechat.MessageChatResponse);
 }
