@@ -6,25 +6,6 @@ import (
 	"time"
 )
 
-/*var Db *gorm.DB
-
-func init() {
-	// 配置 MySQL
-	username := "root"
-	password := "root"
-	host := "127.0.0.1"
-	port := 3306
-	dbname := "tinytiktok-user"
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, port, dbname)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-	if err != nil {
-		log.Fatalln("数据库连接失败", err)
-	}
-	Db = db
-}*/
-
 const (
 	VIDEO_NUM_PER_REFRESH = 6
 )
