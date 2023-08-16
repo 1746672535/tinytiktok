@@ -58,7 +58,7 @@ func (messageService *MessageServiceImpl) SendMessage(fromUserId int64, toUserId
 	switch actionType {
 	// actionType = 1 发送消息
 	case 1:
-		err = models.SendMessage(fromUserId, toUserId, content, actionType)
+		err = models.SendMessage(UserDb, fromUserId, toUserId, content, actionType)
 	default:
 		log.Println(fmt.Sprintf("未定义 actionType=%d", actionType))
 		return errors.New(fmt.Sprintf("未定义 actionType=%d", actionType))
@@ -69,7 +69,7 @@ func (messageService *MessageServiceImpl) SendMessage(fromUserId int64, toUserId
 
 func (messageService *MessageServiceImpl) MessageChat(loginUserId int64, targetUserId int64, latestTime time.Time) ([]Message, error) {
 	messages := make([]Message, 0, VIDEO_INIT_NUM_PER_AUTHOR)
-	plainMessages, err := models.MessageChat(loginUserId, targetUserId, latestTime)
+	plainMessages, err := models.MessageChat(UserDb, loginUserId, targetUserId, latestTime)
 	if err != nil {
 		log.Println("MessageChat Service:", err)
 		return nil, err
@@ -83,7 +83,7 @@ func (messageService *MessageServiceImpl) MessageChat(loginUserId int64, targetU
 }
 
 func (messageService *MessageServiceImpl) LatestMessage(loginUserId int64, targetUserId int64) (LatestMessage, error) {
-	plainMessage, err := models.LatestMessage(loginUserId, targetUserId)
+	plainMessage, err := models.LatestMessage(UserDb, loginUserId, targetUserId)
 	if err != nil {
 		log.Println("LatestMessage Service:", err)
 		return LatestMessage{}, err

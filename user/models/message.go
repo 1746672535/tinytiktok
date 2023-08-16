@@ -1,15 +1,12 @@
 package models
 
 import (
-	"fmt"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"log"
 	"time"
 )
 
-var Db *gorm.DB
+/*var Db *gorm.DB
 
 func init() {
 	// 配置 MySQL
@@ -26,7 +23,7 @@ func init() {
 		log.Fatalln("数据库连接失败", err)
 	}
 	Db = db
-}
+}*/
 
 const (
 	VIDEO_NUM_PER_REFRESH = 6
@@ -52,8 +49,8 @@ func (Message) TableName() string {
 	return "message"
 }
 
-func SaveMessage(msg Message) error {
-	result := Db.Save(&msg)
+func SaveMessage(db *gorm.DB, msg Message) error {
+	result := db.Save(&msg)
 	if result.Error != nil {
 		log.Println("数据库保存消息失败！", result.Error)
 		return result.Error
@@ -62,7 +59,7 @@ func SaveMessage(msg Message) error {
 }
 
 // SendMessage fromUserId 发送消息 content 给 toUserId
-func SendMessage(fromUserId int64, toUserId int64, content string, actionType int64) error {
+func SendMessage(db *gorm.DB, fromUserId int64, toUserId int64, content string, actionType int64) error {
 	var message Message
 	message.UserId = fromUserId
 	message.ReceiverId = toUserId
@@ -70,13 +67,13 @@ func SendMessage(fromUserId int64, toUserId int64, content string, actionType in
 	message.MsgContent = content
 	message.CreatedAt = time.Now()
 	message.UpdatedAt = time.Now()
-	return SaveMessage(message)
+	return SaveMessage(db, message)
 }
 
 // MessageChat 当前登录用户和其他指定用户的聊天记录
-func MessageChat(loginUserId int64, targetUserId int64, latestTime time.Time) ([]Message, error) {
+func MessageChat(db *gorm.DB, loginUserId int64, targetUserId int64, latestTime time.Time) ([]Message, error) {
 	messages := make([]Message, 0, VIDEO_NUM_PER_REFRESH)
-	result := Db.Where("(created_at > ? and created_at < ? ) and ((user_id = ? and receiver_id = ?) or (user_id = ? and receiver_id = ?))", latestTime, time.Now(), loginUserId, targetUserId, targetUserId, loginUserId).
+	result := db.Where("(created_at > ? and created_at < ? ) and ((user_id = ? and receiver_id = ?) or (user_id = ? and receiver_id = ?))", latestTime, time.Now(), loginUserId, targetUserId, targetUserId, loginUserId).
 		Order("created_at asc").
 		Find(&messages)
 	if result.RowsAffected == 0 {
@@ -90,9 +87,9 @@ func MessageChat(loginUserId int64, targetUserId int64, latestTime time.Time) ([
 }
 
 // LatestMessage 返回 loginUserId 和 targetUserId 最近的一条聊天记录
-func LatestMessage(loginUserId int64, targetUserId int64) (Message, error) {
+func LatestMessage(db *gorm.DB, loginUserId int64, targetUserId int64) (Message, error) {
 	var message Message
-	result := Db.Where(&Message{UserId: loginUserId, ReceiverId: targetUserId}).
+	result := db.Where(&Message{UserId: loginUserId, ReceiverId: targetUserId}).
 		Or(&Message{UserId: targetUserId, ReceiverId: loginUserId}).
 		Order("created_at desc").Limit(1).Take(&message)
 	if result.Error != nil {
