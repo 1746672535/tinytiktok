@@ -34,7 +34,6 @@ func init() {
 	}
 	// 生成表
 	Migrate()
-	err = UserDb.AutoMigrate(&models.Message{})
 }
 
 func Migrate() {
@@ -43,6 +42,10 @@ func Migrate() {
 		panic("无法创建或迁移表")
 	}
 	err = UserDb.AutoMigrate(&models.Relation{})
+	if err != nil {
+		panic("无法创建或迁移表")
+	}
+	err = UserDb.AutoMigrate(&models.Message{})
 	if err != nil {
 		panic("无法创建或迁移表")
 	}
