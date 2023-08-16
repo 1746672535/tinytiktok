@@ -39,6 +39,11 @@ func main() {
 	//聊天记录
 	router.GET("/douyin/message/chat/", userWeb.MessageChat)
 
+	//发表/删除评论
+	router.POST("/douyin/comment/action/", videoWeb.Comment)
+	//评论列表
+	router.POST("/douyin/comment/list/", videoWeb.CommentList)
+
 	_ = router.Run(":5051")
 }
 

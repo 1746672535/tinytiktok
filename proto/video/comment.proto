@@ -1,0 +1,26 @@
+syntax = "proto3";
+package comment;
+option go_package = "tinytiktok/video/proto/comment";
+import "user/info.proto";
+
+message Comment{
+  int64 id = 1; // 视频评论id
+  info.User user = 2; // 评论用户信息
+  string content = 3; // 评论内容
+  string create_date = 4; // 评论发布日期，格式 mm-dd
+}
+
+message CommentRequest {
+  string token = 1; // 用户鉴权token
+  int32 action_type = 2; // 1-发表评论；2-删除评论
+  int64 video_id = 3; // 视频id
+  string content = 4; //评论内容
+  int64 comment_id = 5; //用于删除评论
+}
+
+message CommentResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  Comment comment = 3; //评论成功返回内容
+}
+

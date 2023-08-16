@@ -6,6 +6,8 @@ import "video/like.proto";
 import "video/favorite.proto";
 import "video/publish.proto";
 import "video/detail.proto";
+import "video/comment.proto";
+import "video/commentlist.proto";
 
 service VideoService {
   // 返回最近30条视频信息[最多]
@@ -20,4 +22,8 @@ service VideoService {
   rpc PublishList (publish.PublishListRequest) returns (publish.PublishListResponse) {}
   // 用户的视频详细信息
   rpc Detail (detail.DetailRequest) returns (detail.DetailResponse) {}
+  // 用户评论实现
+  rpc Comment (comment.CommentRequest) returns (comment.CommentResponse) {}
+  // 返回视频的评论列表
+  rpc CommentList (commentlist.CommentListRequest) returns (commentlist.CommentListResponse) {}
 }

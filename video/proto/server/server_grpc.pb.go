@@ -11,6 +11,8 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	comment "tinytiktok/video/proto/comment"
+	commentlist "tinytiktok/video/proto/commentlist"
 	detail "tinytiktok/video/proto/detail"
 	favorite "tinytiktok/video/proto/favorite"
 	feed "tinytiktok/video/proto/feed"
@@ -30,6 +32,8 @@ const (
 	VideoService_Publish_FullMethodName      = "/userServer.VideoService/Publish"
 	VideoService_PublishList_FullMethodName  = "/userServer.VideoService/PublishList"
 	VideoService_Detail_FullMethodName       = "/userServer.VideoService/Detail"
+	VideoService_Comment_FullMethodName      = "/userServer.VideoService/Comment"
+	VideoService_CommentList_FullMethodName  = "/userServer.VideoService/CommentList"
 )
 
 // VideoServiceClient is the client API for VideoService service.
@@ -48,6 +52,10 @@ type VideoServiceClient interface {
 	PublishList(ctx context.Context, in *publish.PublishListRequest, opts ...grpc.CallOption) (*publish.PublishListResponse, error)
 	// 用户的视频详细信息
 	Detail(ctx context.Context, in *detail.DetailRequest, opts ...grpc.CallOption) (*detail.DetailResponse, error)
+	// 用户评论实现
+	Comment(ctx context.Context, in *comment.CommentRequest, opts ...grpc.CallOption) (*comment.CommentResponse, error)
+	// 返回视频的评论列表
+	CommentList(ctx context.Context, in *commentlist.CommentListRequest, opts ...grpc.CallOption) (*commentlist.CommentListResponse, error)
 }
 
 type videoServiceClient struct {
@@ -112,6 +120,24 @@ func (c *videoServiceClient) Detail(ctx context.Context, in *detail.DetailReques
 	return out, nil
 }
 
+func (c *videoServiceClient) Comment(ctx context.Context, in *comment.CommentRequest, opts ...grpc.CallOption) (*comment.CommentResponse, error) {
+	out := new(comment.CommentResponse)
+	err := c.cc.Invoke(ctx, VideoService_Comment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *videoServiceClient) CommentList(ctx context.Context, in *commentlist.CommentListRequest, opts ...grpc.CallOption) (*commentlist.CommentListResponse, error) {
+	out := new(commentlist.CommentListResponse)
+	err := c.cc.Invoke(ctx, VideoService_CommentList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServiceServer is the server API for VideoService service.
 // All implementations must embed UnimplementedVideoServiceServer
 // for forward compatibility
@@ -128,6 +154,10 @@ type VideoServiceServer interface {
 	PublishList(context.Context, *publish.PublishListRequest) (*publish.PublishListResponse, error)
 	// 用户的视频详细信息
 	Detail(context.Context, *detail.DetailRequest) (*detail.DetailResponse, error)
+	// 用户评论实现
+	Comment(context.Context, *comment.CommentRequest) (*comment.CommentResponse, error)
+	// 返回视频的评论列表
+	CommentList(context.Context, *commentlist.CommentListRequest) (*commentlist.CommentListResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -152,6 +182,12 @@ func (UnimplementedVideoServiceServer) PublishList(context.Context, *publish.Pub
 }
 func (UnimplementedVideoServiceServer) Detail(context.Context, *detail.DetailRequest) (*detail.DetailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Detail not implemented")
+}
+func (UnimplementedVideoServiceServer) Comment(context.Context, *comment.CommentRequest) (*comment.CommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Comment not implemented")
+}
+func (UnimplementedVideoServiceServer) CommentList(context.Context, *commentlist.CommentListRequest) (*commentlist.CommentListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CommentList not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
 
@@ -274,6 +310,42 @@ func _VideoService_Detail_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VideoService_Comment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(comment.CommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).Comment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_Comment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).Comment(ctx, req.(*comment.CommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VideoService_CommentList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(commentlist.CommentListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServiceServer).CommentList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VideoService_CommentList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServiceServer).CommentList(ctx, req.(*commentlist.CommentListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VideoService_ServiceDesc is the grpc.ServiceDesc for VideoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +376,14 @@ var VideoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Detail",
 			Handler:    _VideoService_Detail_Handler,
+		},
+		{
+			MethodName: "Comment",
+			Handler:    _VideoService_Comment_Handler,
+		},
+		{
+			MethodName: "CommentList",
+			Handler:    _VideoService_CommentList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
