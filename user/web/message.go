@@ -66,7 +66,7 @@ func MessageChat(ctx *gin.Context) {
 	preMsgTime := ctx.Query("pre_msg_time")
 	var latestTime time.Time
 	if preMsgTime == "" {
-		latestTime = time.Time{} // Use zero time as default
+		latestTime = time.Time{}
 	} else {
 		covPreMsgTime, err := strconv.ParseInt(preMsgTime, 10, 64)
 		if err != nil {

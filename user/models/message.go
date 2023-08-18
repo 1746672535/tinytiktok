@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-const (
-	VIDEO_NUM_PER_REFRESH = 6
-)
-
 type Message struct {
 	gorm.Model
 	Id         int64  `json:"id" gorm:"user_id"`
@@ -53,18 +49,18 @@ func SendMessage(db *gorm.DB, fromUserId int64, toUserId int64, content string, 
 
 // MessageChat 当前登录用户和其他指定用户的聊天记录
 func MessageChat(db *gorm.DB, loginUserId int64, targetUserId int64, latestTime time.Time) ([]Message, error) {
-	messages := make([]Message, 0, VIDEO_NUM_PER_REFRESH)
+	message := make([]Message, 0, 6)
 	result := db.Where("(created_at > ? and created_at < ? ) and ((user_id = ? and receiver_id = ?) or (user_id = ? and receiver_id = ?))", latestTime, time.Now(), loginUserId, targetUserId, targetUserId, loginUserId).
 		Order("created_at asc").
-		Find(&messages)
+		Find(&message)
 	if result.RowsAffected == 0 {
-		return messages, nil
+		return message, nil
 	}
 	if result.Error != nil {
 		log.Println("获取聊天记录失败！")
 		return nil, result.Error
 	}
-	return messages, nil
+	return message, nil
 }
 
 // LatestMessage 返回 loginUserId 和 targetUserId 最近的一条聊天记录
