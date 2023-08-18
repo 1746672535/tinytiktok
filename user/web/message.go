@@ -64,9 +64,6 @@ func MessageChat(ctx *gin.Context) {
 	loginUserId := ctx.GetInt64("userID")
 	toUserId := ctx.Query("to_user_id")
 	preMsgTime := ctx.Query("pre_msg_time")
-	log.Println("preMsgTime", preMsgTime)
-	fmt.Println("p的数值为：", preMsgTime)
-
 	var latestTime time.Time
 	if preMsgTime == "" {
 		latestTime = time.Time{} // Use zero time as default

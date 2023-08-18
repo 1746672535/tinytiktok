@@ -11,21 +11,15 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 	rsp := friendlist.FriendListResponse{}
 	users := models.GetFriendList(UserDb, req.UserId)
 	var friendList []*friendlist.FriendUser
-
-	// Get the MessageService instance
 	messageService := GetMessageServiceInstance()
-
 	for _, v := range users {
-		// // Get the latest message info for the user
 		messageInfo, err := messageService.LatestMessage(req.UserId, v.ID)
-		// In case of an error, skip and continue to the next user
 		if err != nil {
 			if err.Error() != "record not found" {
 				continue
 			}
-			messageInfo.message = ""
+			messageInfo.Message = ""
 		}
-
 		friendList = append(friendList, &friendlist.FriendUser{
 			Id:              v.ID,
 			Name:            v.Name,
@@ -38,13 +32,12 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 			TotalFavorited:  v.TotalFavorited,
 			WorkCount:       v.WorkCount,
 			FavoriteCount:   v.FavoriteCount,
-			Message:         &messageInfo.message,
-			MsgType:         messageInfo.msgType,
+			Message:         &messageInfo.Message,
+			MsgType:         messageInfo.MsgType,
 		})
 	}
 	rsp.UserList = friendList
 	rsp.StatusMsg = msg.Ok
 	rsp.StatusCode = msg.Success
-
 	return &rsp, nil
 }
