@@ -17,7 +17,7 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 	messageService := GetMessageServiceInstance()
 
 	for _, v := range users {
-		// Get the latest message info for the user
+		// // Get the latest message info for the user
 		messageInfo, err := messageService.LatestMessage(req.UserId, v.ID)
 		// In case of an error, skip and continue to the next user
 		if err != nil {
@@ -30,7 +30,7 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 				Name:            v.Name,
 				FollowCount:     v.FollowCount,
 				FollowerCount:   v.FollowerCount,
-				IsFollow:        v.IsFollow,
+				IsFollow:        true,
 				Avatar:          v.Avatar,
 				BackgroundImage: v.BackgroundImg,
 				Signature:       v.Signature,
@@ -38,8 +38,8 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 				WorkCount:       v.WorkCount,
 				FavoriteCount:   v.FavoriteCount,
 			},
-			Message: messageInfo.message, // Set the message content
-			MsgType: messageInfo.msgType, // Set the message type
+			Message: &messageInfo.message,
+			MsgType: messageInfo.msgType,
 		})
 	}
 	rsp.UserList = friendList
