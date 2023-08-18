@@ -4,7 +4,6 @@ import (
 	"context"
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/friendlist"
-	"tinytiktok/user/proto/info2"
 	"tinytiktok/utils/msg"
 )
 
@@ -21,25 +20,26 @@ func (h *Handle) FriendList(ctx context.Context, req *friendlist.FriendListReque
 		messageInfo, err := messageService.LatestMessage(req.UserId, v.ID)
 		// In case of an error, skip and continue to the next user
 		if err != nil {
-			continue
+			if err.Error() != "record not found" {
+				continue
+			}
+			messageInfo.message = ""
 		}
 
 		friendList = append(friendList, &friendlist.FriendUser{
-			User: &info2.User{
-				Id:              v.ID,
-				Name:            v.Name,
-				FollowCount:     v.FollowCount,
-				FollowerCount:   v.FollowerCount,
-				IsFollow:        true,
-				Avatar:          v.Avatar,
-				BackgroundImage: v.BackgroundImg,
-				Signature:       v.Signature,
-				TotalFavorited:  v.TotalFavorited,
-				WorkCount:       v.WorkCount,
-				FavoriteCount:   v.FavoriteCount,
-			},
-			Message: &messageInfo.message,
-			MsgType: messageInfo.msgType,
+			Id:              v.ID,
+			Name:            v.Name,
+			FollowCount:     v.FollowCount,
+			FollowerCount:   v.FollowerCount,
+			IsFollow:        v.IsFollow,
+			Avatar:          v.Avatar,
+			BackgroundImage: v.BackgroundImg,
+			Signature:       v.Signature,
+			TotalFavorited:  v.TotalFavorited,
+			WorkCount:       v.WorkCount,
+			FavoriteCount:   v.FavoriteCount,
+			Message:         &messageInfo.message,
+			MsgType:         messageInfo.msgType,
 		})
 	}
 	rsp.UserList = friendList

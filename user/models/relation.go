@@ -55,6 +55,7 @@ func GetFriendList(db *gorm.DB, userId int64) []*User {
 			if err != nil {
 				continue
 			}
+			user.IsFollow = true
 			userList = append(userList, user)
 		}
 	}
