@@ -14,12 +14,10 @@ import (
 )
 
 func CommentList(ctx *gin.Context) {
-	// 鉴权 获取用户信息 拿到用户ID
+	// 鉴权
 	if !ctx.GetBool("auth") {
-		common.ReturnErr(ctx, msg.AuthError)
-		return
+		//无需鉴权
 	}
-
 	// 获取参数
 	videoID := ctx.DefaultQuery("video_id", "-1")
 	videoIDInt, err := strconv.Atoi(videoID)

@@ -2,6 +2,7 @@ package srv
 
 import (
 	"context"
+	"time"
 	"tinytiktok/utils/msg"
 	"tinytiktok/video/models"
 	"tinytiktok/video/proto/comment"
@@ -13,16 +14,33 @@ func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp 
 	//发表评论
 	if req.ActionType == 1 {
 		c := &models.Comment{
+			UserID:  req.UserId,
 			VideoID: req.VideoId,
 			Content: req.Content,
 		}
-		err = models.CommentVideo(VideoDb, c)
+		var CommentID, err = models.CommentVideo(VideoDb, c)
 		// 为视频的评论数量+1
 		err = models.CalcCommentCountByVideoID(VideoDb, req.VideoId, true)
 		if err != nil {
 			rsp.StatusCode = 1
 			rsp.StatusMsg = "not ok"
 			return rsp, err
+		}
+		// 查询视频作者信息
+		user, err := models.GetUserInfo(req.UserId)
+		//获取当前时间
+		currentTime := time.Now()
+		// 将时间格式化为 "MM-DD" 格式
+		currentDate := currentTime.Format("01-02")
+
+		if err != nil {
+			return rsp, err
+		}
+		rsp.Comment = &comment.Comment{
+			Id:         CommentID,
+			User:       user,
+			Content:    req.Content,
+			CreateDate: currentDate,
 		}
 	}
 	//删除评论

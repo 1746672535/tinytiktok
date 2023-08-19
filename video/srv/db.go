@@ -49,4 +49,8 @@ func Migrate() {
 	if err != nil {
 		panic("无法创建或迁移表")
 	}
+	err = VideoDb.AutoMigrate(&models.Comment{})
+	if err != nil {
+		panic("无法创建或迁移表")
+	}
 }

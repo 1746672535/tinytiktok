@@ -43,12 +43,16 @@ func CalcCommentCountByVideoID(db *gorm.DB, videoID int64, isCommented bool) err
 }
 
 // CommentVideo 将评论插入数据库
-func CommentVideo(db *gorm.DB, comment *Comment) error {
+func CommentVideo(db *gorm.DB, comment *Comment) (int64, error) {
 	result := db.Create(comment)
 	if result.Error != nil {
-		return result.Error
+		return -1, result.Error
 	}
-	return nil
+
+	var CommentId int64
+	db.Raw("select LAST_INSERT_ID() as id").Pluck("id", &CommentId)
+
+	return CommentId, nil
 }
 
 func GetCommentListByVideoID(db *gorm.DB, videoID int64) ([]*Comment, error) {
@@ -60,9 +64,23 @@ func GetCommentListByVideoID(db *gorm.DB, videoID int64) ([]*Comment, error) {
 	return comments, nil
 }
 
+// GetVideoCount 获取视频评论数量
+func GetVideoCommentsCount(db *gorm.DB, videoID int64) (int64, error) {
+	var count int64
+	result := db.Model(&Comment{}).Where("video_id = ? ", videoID).Count(&count)
+	if result.Error != nil {
+		// 查询出错
+		return 0, result.Error
+	}
+	return count, nil
+}
+
 // DeleteComment 用户删除视频
 func DeleteComment(db *gorm.DB, commentID int64) error {
-	result := db.Delete(&commentID)
+	comment := Comment{}
+
+	db.Where("id = ?", commentID).Take(&comment)
+	result := db.Delete(&comment)
 	if result.Error != nil {
 		return result.Error
 	}

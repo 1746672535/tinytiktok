@@ -42,7 +42,7 @@ func main() {
 	//发表/删除评论
 	router.POST("/douyin/comment/action/", videoWeb.Comment)
 	//评论列表
-	router.POST("/douyin/comment/list/", videoWeb.CommentList)
+	router.GET("/douyin/comment/list/", videoWeb.CommentList)
 
 	_ = router.Run(":5051")
 }

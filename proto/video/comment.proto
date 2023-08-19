@@ -1,6 +1,6 @@
 syntax = "proto3";
 package comment;
-option go_package = "tinytiktok/video/proto/comment";
+option go_package = "/go_workspace/tinytiktok/video/proto/comment";
 import "user/info.proto";
 
 message Comment{
@@ -13,9 +13,10 @@ message Comment{
 message CommentRequest {
   string token = 1; // 用户鉴权token
   int32 action_type = 2; // 1-发表评论；2-删除评论
-  int64 video_id = 3; // 视频id
-  string content = 4; //评论内容
-  int64 comment_id = 5; //用于删除评论
+  int64 user_id = 3;//用户id
+  int64 video_id = 4; // 视频id
+  string content = 5; //评论内容
+  int64 comment_id = 6; //用于删除评论
 }
 
 message CommentResponse {
