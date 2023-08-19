@@ -1,1 +1,1 @@
-setx /m App %cd%
+setx App D:\go_workspace\tinytiktok
