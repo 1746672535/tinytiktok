@@ -74,9 +74,8 @@ func MessageChat(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, Response{StatusCode: 1, StatusMsg: "Invalid preMsgTime"})
 			return
 		}
-		latestTime = time.Unix(covPreMsgTime, 0)
+		latestTime = time.Unix(covPreMsgTime, 0).Add(1 * time.Second)
 	}
-
 	targetUserId, err := strconv.ParseInt(toUserId, 10, 64)
 	if err != nil {
 		log.Println("toUserId 参数错误")
