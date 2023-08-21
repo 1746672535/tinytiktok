@@ -19,8 +19,22 @@ func (Message) TableName() string {
 	return "message"
 }
 
-func SaveMessage(db *gorm.DB, msg Message) error {
-	result := db.Save(&msg)
+type ChatMessage struct {
+	Id         int64  `json:"id"`
+	UserId     int64  `json:"from_user_id"`
+	ReceiverId int64  `json:"to_user_id"`
+	MsgContent string `json:"content"`
+	CreatedAt  int64  `json:"create_time"`
+}
+
+func SendMessage(db *gorm.DB, fromUserId int64, toUserId int64, content string, actionType int64) error {
+	message := Message{
+		UserId:     fromUserId,
+		ReceiverId: toUserId,
+		ActionType: actionType,
+		MsgContent: content,
+	}
+	result := db.Save(&message)
 	if result.Error != nil {
 		log.Println("数据库保存消息失败！", result.Error)
 		return result.Error
@@ -28,19 +42,6 @@ func SaveMessage(db *gorm.DB, msg Message) error {
 	return nil
 }
 
-// SendMessage fromUserId 发送消息 content 给 toUserId
-func SendMessage(db *gorm.DB, fromUserId int64, toUserId int64, content string, actionType int64) error {
-	var message Message
-	message.UserId = fromUserId
-	message.ReceiverId = toUserId
-	message.ActionType = actionType
-	message.MsgContent = content
-	message.CreatedAt = time.Now()
-	message.UpdatedAt = time.Now()
-	return SaveMessage(db, message)
-}
-
-// MessageChat 当前登录用户和其他指定用户的聊天记录
 func MessageChat(db *gorm.DB, loginUserId int64, targetUserId int64, latestTime time.Time) ([]Message, error) {
 	message := make([]Message, 0, 6)
 	result := db.Where("(created_at > ? and created_at < ? ) and ((user_id = ? and receiver_id = ?) or (user_id = ? and receiver_id = ?))", latestTime, time.Now(), loginUserId, targetUserId, targetUserId, loginUserId).
@@ -56,7 +57,6 @@ func MessageChat(db *gorm.DB, loginUserId int64, targetUserId int64, latestTime 
 	return message, nil
 }
 
-// LatestMessage 返回 loginUserId 和 targetUserId 最近的一条聊天记录
 func LatestMessage(db *gorm.DB, loginUserId int64, targetUserId int64) (Message, error) {
 	var message Message
 	result := db.Where(&Message{UserId: loginUserId, ReceiverId: targetUserId}).
