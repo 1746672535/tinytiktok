@@ -17,7 +17,7 @@ func main() {
 	// config
 	path := os.Getenv("APP")
 	cfg := config.NewConfig(fmt.Sprintf("%s/config", path), "server.yaml", "yaml")
-	gin.SetMode(cfg.ReadString("Mode"))
+	gin.SetMode(cfg.ReadString("Server.Mode"))
 	// dfs
 	router.POST("/dfs/auth/", dfs.Auth)
 	// 注册
