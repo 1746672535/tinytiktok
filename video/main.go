@@ -46,5 +46,7 @@ func main() {
 	}
 	// 延迟注销服务
 	defer reg.DeRegister(id)
+	// 需要再服务退出之前将redis中的数据同步到mysql中
+	defer srv.FlushLikeDataToMysql()
 	_ = g.Serve(listen)
 }

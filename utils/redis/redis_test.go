@@ -8,12 +8,14 @@ import (
 type Person struct {
 	Name    string
 	Age     int
+	IsStu   bool
 	Country string
 }
 
 type Person2 struct {
 	Name    string
 	Age     int
+	IsStu   bool
 	Country string
 }
 
@@ -21,6 +23,7 @@ func TestRedis(t *testing.T) {
 	p1 := Person{
 		Name:    "Alice",
 		Age:     24,
+		IsStu:   true,
 		Country: "USA",
 	}
 	// note 尽量使用指针类型传递值

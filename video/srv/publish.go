@@ -52,7 +52,7 @@ func (h *Handle) PublishList(ctx context.Context, req *publish.PublishListReques
 			continue
 		}
 		// 查询该视频是否被该用户点赞
-		like, err := models.IsUserLikedVideo(VideoDb, v.ID, req.UserId)
+		like, err := models.IsUserLikedVideo(VideoDb, req.UserId, v.ID)
 		if err != nil {
 			continue
 		}

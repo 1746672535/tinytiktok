@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"time"
 	"tinytiktok/user/models"
+	"tinytiktok/utils/redis"
 )
 
 type Like struct {
@@ -13,6 +14,17 @@ type Like struct {
 	UserID  int64 `gorm:"column:user_id" json:"user_id"`
 	VideoID int64 `gorm:"column:video_id" json:"video_id"`
 	State   bool  `gorm:"column:state" json:"state"`
+	// 用于redis同步数据库
+	Table  string `gorm:"-"`
+	IsEdit bool   `gorm:"-"`
+}
+
+type LikeCache struct {
+	UserID  int64
+	VideoID int64
+	State   bool
+	Table   string
+	IsEdit  bool
 }
 
 func (l Like) TableName() string {
@@ -40,7 +52,15 @@ func CalcFavoriteCountByVideoID(db *gorm.DB, videoID int64, isFavorite bool) err
 }
 
 // IsUserLikedVideo 判断用户是否点赞了指定视频
-func IsUserLikedVideo(db *gorm.DB, videoID, userID int64) (bool, error) {
+func IsUserLikedVideo(db *gorm.DB, userID, videoID int64) (bool, error) {
+	var likeCache LikeCache
+	key := redis.Key("like", userID, videoID)
+	// 查询redis
+	err := redis.GetHash(key, &likeCache)
+	if err != nil {
+		return likeCache.State, nil
+	}
+	// 查询redis失败则说明在redis中找不到点赞记录, 那么开始查询数据库并将结果同步至redis中
 	var like Like
 	// 查询用户是否点赞了视频
 	result := db.Where("video_id = ? AND user_id = ?", videoID, userID).First(&like)
@@ -52,6 +72,14 @@ func IsUserLikedVideo(db *gorm.DB, videoID, userID int64) (bool, error) {
 		// 查询出错
 		return false, result.Error
 	}
+	// 同步数据到Redis
+	_ = redis.PutHash(key, &LikeCache{
+		UserID:  like.UserID,
+		VideoID: like.VideoID,
+		State:   like.State,
+		Table:   "like",
+		IsEdit:  false,
+	})
 	// 找到记录，表示用户已点赞该视频
 	if like.State {
 		return like.State, nil
@@ -60,9 +88,10 @@ func IsUserLikedVideo(db *gorm.DB, videoID, userID int64) (bool, error) {
 }
 
 // LikeVideo 用户点赞或取消点赞视频
-func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
+func LikeVideo(db *gorm.DB, userID, videoID int64, isFavorite bool) error {
 	var like Like
-	result := db.Where("video_id = ? AND user_id = ?", videoID, userID).First(&like)
+	tc := db.Begin()
+	result := tc.Where("video_id = ? AND user_id = ?", videoID, userID).First(&like)
 	if result.Error != nil {
 		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			// 查询出错
@@ -74,7 +103,7 @@ func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
 			VideoID: videoID,
 			State:   isFavorite,
 		}
-		result = db.Create(&like)
+		result = tc.Create(&like)
 		if result.Error != nil {
 			// 添加记录出错
 			return result.Error
@@ -87,22 +116,27 @@ func LikeVideo(db *gorm.DB, videoID, userID int64, isFavorite bool) error {
 		// 记录已存在，更新结果和更新时间
 		like.UpdatedAt = time.Now()
 		like.State = isFavorite
-		result = db.Save(&like)
+		result = tc.Save(&like)
 		if result.Error != nil {
 			// 如果出错则将数据回滚
-			db.Rollback()
+			tc.Rollback()
 			// 更新记录出错
 			return result.Error
 		}
 	}
 	// 为视频点赞数量 +1 / -1
-	err := CalcFavoriteCountByVideoID(db, videoID, isFavorite)
+	err := CalcFavoriteCountByVideoID(tc, videoID, isFavorite)
 	if err != nil {
-		db.Rollback()
+		tc.Rollback()
 		return err
 	}
 	// 为用户的点赞数量 +1 / -1
-	CalcFavoriteCountByUserID(db, userID, isFavorite)
+	err = CalcFavoriteCountByUserID(tc, userID, isFavorite)
+	if err != nil {
+		tc.Rollback()
+		return err
+	}
+	tc.Commit()
 	return nil
 }
 

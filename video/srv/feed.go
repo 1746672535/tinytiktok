@@ -31,7 +31,7 @@ func (h *Handle) Feed(ctx context.Context, req *feed.FeedRequest) (rsp *feed.Fee
 		// 查询该视频是否被该用户点赞
 		like := false
 		if req.UserId != 0 {
-			like, err = models.IsUserLikedVideo(VideoDb, v.ID, req.UserId)
+			like, err = models.IsUserLikedVideo(VideoDb, req.UserId, v.ID)
 			if err != nil {
 				continue
 			}

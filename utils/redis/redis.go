@@ -6,11 +6,13 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"time"
 	"tinytiktok/utils/config"
 )
 
-// note 请务在外部调用client, 应使用redis包提供的方法
-var client *redis.Client
+var Client *redis.Client
+var RefreshTime int
+var ExpireTime int
 
 func init() {
 	// 初始化配置文件
@@ -20,20 +22,33 @@ func init() {
 	host := redisConfig.ReadString("Host")
 	port := redisConfig.ReadInt("Port")
 	password := redisConfig.ReadString("Password")
-	client = redis.NewClient(&redis.Options{
+	RefreshTime = redisConfig.ReadInt("RefreshTime")
+	ExpireTime = redisConfig.ReadInt("ExpireTime")
+	if ExpireTime <= RefreshTime {
+		panic("Redis Config Error: 过期时间必须大于刷新时间")
+	}
+	Client = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", host, port),
 		Password: password,
 	})
 }
 
+func Key(keys ...any) string {
+	joinedStr := ""
+	for _, value := range keys {
+		joinedStr += fmt.Sprintf("%v-", value)
+	}
+	return joinedStr[:len(joinedStr)-1]
+}
+
 // Del 删除redis的数据
 func Del(key string) error {
-	return client.Del(key).Err()
+	return Client.Del(key).Err()
 }
 
 // Exists 判断是否存在key对应的数据
 func Exists(key string) (bool, error) {
-	has, err := client.Exists(key).Result()
+	has, err := Client.Exists(key).Result()
 	if has == 1 {
 		return true, err
 	}
@@ -42,24 +57,28 @@ func Exists(key string) (bool, error) {
 
 // HSet 设置key中某一个字段的值
 func HSet(key, filed string, value any) error {
-	return client.HSet(key, filed, value).Err()
+	return Client.HSet(key, filed, value).Err()
 }
 
 // HGet 获取key中某一个字段的值
 func HGet(key, field string) (any, error) {
-	data := client.HGet(key, field)
+	data := Client.HGet(key, field)
 	return restoreValue(data.Val()), data.Err()
 }
 
 // PutHash 将结构体数据存储到redis中
 func PutHash(key string, obj any) error {
 	data := structToMap(obj)
-	return client.HMSet(key, data).Err()
+	err := Client.HMSet(key, data).Err()
+	if err != nil {
+		return err
+	}
+	return Client.Expire(key, time.Duration(ExpireTime)*time.Second).Err()
 }
 
 // GetHash 根据key获取结构体数据
 func GetHash(key string, obj any) error {
-	data := client.HGetAll(key)
+	data := Client.HGetAll(key)
 	if data.Err() != nil {
 		return data.Err()
 	}
@@ -99,10 +118,18 @@ func mapToStruct(obj any, data map[string]interface{}) any {
 	for key, value := range data {
 		field, found := objType.FieldByName(key)
 		if found {
-			fieldValue := reflect.ValueOf(obj).Elem().FieldByName(field.Name)
+			fieldValue := objValue.Elem().FieldByName(field.Name)
 			if fieldValue.IsValid() && fieldValue.CanSet() {
-				// 使用类型断言将值转换为字段类型，并设置字段的值
-				fieldValue.Set(reflect.ValueOf(value).Convert(field.Type))
+				// 根据字段类型进行不同的处理
+				switch fieldValue.Kind() {
+				case reflect.Bool:
+					if value == 1 {
+						fieldValue.SetBool(true)
+					}
+				default:
+					// 其他类型进行通用的转换处理
+					fieldValue.Set(reflect.ValueOf(value).Convert(field.Type))
+				}
 			}
 		}
 	}
