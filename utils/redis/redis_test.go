@@ -2,47 +2,71 @@ package redis
 
 import (
 	"fmt"
-	"github.com/go-redis/redis"
+	"testing"
 )
 
-func main() {
-	// 创建Redis客户端
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // Redis服务器地址和端口
-		Password: "",               // Redis服务器密码，如果有的话
-		DB:       0,                // 使用的Redis数据库
-	})
+type Person struct {
+	Name    string
+	Age     int
+	Country string
+}
 
-	// 存储Hash类型数据
-	err := client.HSet("user:1", "name", "John Doe").Err()
-	if err != nil {
-		panic(err)
+type Person2 struct {
+	Name    string
+	Age     int
+	Country string
+}
+
+func TestRedis(t *testing.T) {
+	p1 := Person{
+		Name:    "Alice",
+		Age:     24,
+		Country: "USA",
+	}
+	// note 尽量使用指针类型传递值
+	_ = PutHash("user-1", &p1)
+
+	// note 只要字段名一致就可以映射
+	p2 := &Person2{}
+	_ = GetHash("user-1", p2)
+	fmt.Println(p2)
+
+	// HSet note 请注意字段区分大小写
+	_ = HSet("user-1", "Name", "Alma")
+
+	// HGet
+	value, _ := HGet("user-1", "Name")
+	fmt.Println(value)
+
+	// Exists
+	exists, _ := Exists("user-1")
+	fmt.Println(exists)
+
+	// Del
+	_ = Del("user-1")
+}
+
+func TestReflect(t *testing.T) {
+	// 创建结构体实例
+	person := Person{
+		Name:    "John",
+		Age:     21,
+		Country: "USA",
 	}
 
-	// 获取Hash类型数据的某个字段值
-	name, err := client.HGet("user:1", "name").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Name:", name)
+	// 将结构体转换为map[string]interface{}
+	personMap := structToMap(&person)
+	fmt.Println(personMap)
 
-	// 获取Hash类型数据的所有字段和值
-	user, err := client.HGetAll("user:1").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("User:", user)
-
-	// 删除Hash类型数据的某个字段
-	err = client.HDel("user:1", "name").Err()
-	if err != nil {
-		panic(err)
+	// 创建一个新的map[string]interface{}
+	newPersonMap := map[string]interface{}{
+		"Name":    "Jack",
+		"Age":     24,
+		"Country": "UK",
 	}
 
-	// 检查Hash类型数据的某个字段是否存在
-	exists, err := client.HExists("user:1", "name").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Name exists:", exists)
+	// 将map[string]interface{}转换为结构体
+	p := Person{}
+	mapToStruct(&p, newPersonMap)
+	fmt.Println(p)
 }
