@@ -4,27 +4,27 @@ option go_package = "tinytiktok/user/proto/server";
 import "user/register.proto";
 import "user/login.proto";
 import "user/info.proto";
-import "user/followlist.proto";
-import "user/followerlist.proto";
+import "user/follow_list.proto";
+import "user/follower_list.proto";
 import "user/focus.proto";
-import "user/friendlist.proto";
-import "user/messageact.proto";
-import "user/messagechat.proto";
+import "user/friend_list.proto";
+import "user/message_act.proto";
+import "user/message_chat.proto";
 
 service UserService {
   rpc Register (register.RegisterRequest) returns (register.RegisterResponse) {}
   rpc Login (login.LoginRequest) returns (login.LoginResponse) {}
   rpc Info (info.UserRequest) returns (info.UserResponse) {}
   // 关注列表
-  rpc FollowList (followlist.FollowListRequest) returns (followlist.FollowListResponse) {}
+  rpc FollowList (followList.FollowListRequest) returns (followList.FollowListResponse) {}
   // 粉丝列表
-  rpc FollowerList (followerlist.FollowerListRequest) returns (followerlist.FollowerListResponse) {}
+  rpc FollowerList (followerList.FollowerListRequest) returns (followerList.FollowerListResponse) {}
   // 关注操作
   rpc Favorite (focus.FavoriteRequest) returns (focus.FavoriteResponse);
   // 好友列表
-  rpc FriendList (friendlist.FriendListRequest) returns (friendlist.FriendListResponse);
+  rpc FriendList (friendList.FriendListRequest) returns (friendList.FriendListResponse);
   //发送信息
-  rpc MessageAct (messageact.MessageActionRequest) returns (messageact.MessageActionResponse);
+  rpc MessageAct (messageAct.MessageActionRequest) returns (messageAct.MessageActionResponse);
   //聊天记录
-  rpc MassageChat (messagechat.MessageChatRequest) returns (messagechat.MessageChatResponse);
+  rpc MassageChat (messageChat.MessageChatRequest) returns (messageChat.MessageChatResponse);
 }

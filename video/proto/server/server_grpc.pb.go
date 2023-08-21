@@ -12,7 +12,7 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	comment "tinytiktok/video/proto/comment"
-	commentlist "tinytiktok/video/proto/commentlist"
+	commentList "tinytiktok/video/proto/commentList"
 	detail "tinytiktok/video/proto/detail"
 	favorite "tinytiktok/video/proto/favorite"
 	feed "tinytiktok/video/proto/feed"
@@ -55,7 +55,7 @@ type VideoServiceClient interface {
 	// 用户评论实现
 	Comment(ctx context.Context, in *comment.CommentRequest, opts ...grpc.CallOption) (*comment.CommentResponse, error)
 	// 返回视频的评论列表
-	CommentList(ctx context.Context, in *commentlist.CommentListRequest, opts ...grpc.CallOption) (*commentlist.CommentListResponse, error)
+	CommentList(ctx context.Context, in *commentList.CommentListRequest, opts ...grpc.CallOption) (*commentList.CommentListResponse, error)
 }
 
 type videoServiceClient struct {
@@ -129,8 +129,8 @@ func (c *videoServiceClient) Comment(ctx context.Context, in *comment.CommentReq
 	return out, nil
 }
 
-func (c *videoServiceClient) CommentList(ctx context.Context, in *commentlist.CommentListRequest, opts ...grpc.CallOption) (*commentlist.CommentListResponse, error) {
-	out := new(commentlist.CommentListResponse)
+func (c *videoServiceClient) CommentList(ctx context.Context, in *commentList.CommentListRequest, opts ...grpc.CallOption) (*commentList.CommentListResponse, error) {
+	out := new(commentList.CommentListResponse)
 	err := c.cc.Invoke(ctx, VideoService_CommentList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ type VideoServiceServer interface {
 	// 用户评论实现
 	Comment(context.Context, *comment.CommentRequest) (*comment.CommentResponse, error)
 	// 返回视频的评论列表
-	CommentList(context.Context, *commentlist.CommentListRequest) (*commentlist.CommentListResponse, error)
+	CommentList(context.Context, *commentList.CommentListRequest) (*commentList.CommentListResponse, error)
 	mustEmbedUnimplementedVideoServiceServer()
 }
 
@@ -186,7 +186,7 @@ func (UnimplementedVideoServiceServer) Detail(context.Context, *detail.DetailReq
 func (UnimplementedVideoServiceServer) Comment(context.Context, *comment.CommentRequest) (*comment.CommentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Comment not implemented")
 }
-func (UnimplementedVideoServiceServer) CommentList(context.Context, *commentlist.CommentListRequest) (*commentlist.CommentListResponse, error) {
+func (UnimplementedVideoServiceServer) CommentList(context.Context, *commentList.CommentListRequest) (*commentList.CommentListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CommentList not implemented")
 }
 func (UnimplementedVideoServiceServer) mustEmbedUnimplementedVideoServiceServer() {}
@@ -329,7 +329,7 @@ func _VideoService_Comment_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _VideoService_CommentList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(commentlist.CommentListRequest)
+	in := new(commentList.CommentListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -341,7 +341,7 @@ func _VideoService_CommentList_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: VideoService_CommentList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VideoServiceServer).CommentList(ctx, req.(*commentlist.CommentListRequest))
+		return srv.(VideoServiceServer).CommentList(ctx, req.(*commentList.CommentListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

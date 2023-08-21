@@ -1,0 +1,21 @@
+Server:
+  Mode: release | debug | test
+  Port: 5051
+
+Consul:
+  Host: 127.0.0.1
+  Port: 8500
+
+User:
+  Name: user-srv
+  Tag: [ "srv", "user" ]
+  Timeout: 3s
+  Interval: 5s
+  DeregisterCriticalServiceAfter: 10s
+
+Video:
+  Name: video-srv
+  Tag: [ "srv", "video" ]
+  Timeout: 3s
+  Interval: 5s
+  DeregisterCriticalServiceAfter: 10s

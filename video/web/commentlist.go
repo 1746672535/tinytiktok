@@ -9,14 +9,14 @@ import (
 	"tinytiktok/common"
 	"tinytiktok/utils/consul"
 	"tinytiktok/utils/msg"
-	"tinytiktok/video/proto/commentlist"
+	"tinytiktok/video/proto/commentList"
 	"tinytiktok/video/proto/server"
 )
 
 func CommentList(ctx *gin.Context) {
 	// 鉴权
 	if !ctx.GetBool("auth") {
-		//无需鉴权
+		// 无需鉴权
 	}
 	// 获取参数
 	videoID := ctx.DefaultQuery("video_id", "-1")
@@ -26,7 +26,7 @@ func CommentList(ctx *gin.Context) {
 	conn := consul.GetClientConn("video-srv")
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
-	rsp, err := client.CommentList(metadata.NewOutgoingContext(context.Background(), md), &commentlist.CommentListRequest{
+	rsp, err := client.CommentList(metadata.NewOutgoingContext(context.Background(), md), &commentList.CommentListRequest{
 		VideoId: int64(videoIDInt),
 	})
 	if err != nil {

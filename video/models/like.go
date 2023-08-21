@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 	"time"
 	"tinytiktok/user/models"
@@ -25,11 +24,7 @@ func CalcFavoriteCountByVideoID(db *gorm.DB, videoID int64, isFavorite bool) err
 	var video Video
 	result := db.First(&video, videoID)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("video with ID %d not found", videoID)
-		} else {
-			return result.Error
-		}
+		return result.Error
 	}
 	if isFavorite {
 		video.FavoriteCount++

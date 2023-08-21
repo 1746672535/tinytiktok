@@ -15,13 +15,6 @@ type Message struct {
 	MsgContent string `json:"msg_content" gorm:"msg_content"`
 }
 
-// APIMessage 返回提取的消息（仅需 Message 的部分字段）
-type APIMessage struct {
-	Id         int64     `json:"id"`
-	MsgContent int64     `json:"content" gorm:"msg_content"`
-	CreatedAt  time.Time `json:"create_time"`
-}
-
 func (Message) TableName() string {
 	return "message"
 }

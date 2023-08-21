@@ -1,8 +1,6 @@
 package models
 
 import (
-	"errors"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -23,11 +21,7 @@ func CalcCommentCountByVideoID(db *gorm.DB, videoID int64, isCommented bool) err
 	var video Video
 	result := db.First(&video, videoID)
 	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("video with ID %d not found", videoID)
-		} else {
-			return result.Error
-		}
+		return result.Error
 	}
 	if isCommented {
 		video.CommentCount++
@@ -55,6 +49,7 @@ func CommentVideo(db *gorm.DB, comment *Comment) (int64, error) {
 	return CommentId, nil
 }
 
+// GetCommentListByVideoID 通过VideoID获取评论列表
 func GetCommentListByVideoID(db *gorm.DB, videoID int64) ([]*Comment, error) {
 	var comments []*Comment
 	err := db.Where("video_id = ?", videoID).Find(&comments).Error
@@ -64,7 +59,7 @@ func GetCommentListByVideoID(db *gorm.DB, videoID int64) ([]*Comment, error) {
 	return comments, nil
 }
 
-// GetVideoCount 获取视频评论数量
+// GetVideoCommentsCount 获取视频评论数量
 func GetVideoCommentsCount(db *gorm.DB, videoID int64) (int64, error) {
 	var count int64
 	result := db.Model(&Comment{}).Where("video_id = ? ", videoID).Count(&count)

@@ -22,7 +22,7 @@ func (h *Handle) Publish(ctx context.Context, req *publish.PublishRequest) (rsp 
 	err = models.CalcWorkCountByUserID(VideoDb, req.AuthorId, true)
 	if err != nil {
 		rsp.StatusCode = 1
-		rsp.StatusMsg = "not ok"
+		rsp.StatusMsg = msg.NotOk
 		return rsp, err
 	}
 
@@ -39,7 +39,7 @@ func (h *Handle) PublishList(ctx context.Context, req *publish.PublishListReques
 	videos, err := models.GetVideoListByUserID(VideoDb, req.UserId)
 	if err != nil {
 		rsp.StatusCode = 1
-		rsp.StatusMsg = "not ok"
+		rsp.StatusMsg = msg.NotOk
 		return rsp, err
 	}
 

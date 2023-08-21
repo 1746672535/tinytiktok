@@ -12,13 +12,13 @@ import (
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	focus "tinytiktok/user/proto/focus"
-	followerlist "tinytiktok/user/proto/followerlist"
-	followlist "tinytiktok/user/proto/followlist"
-	friendlist "tinytiktok/user/proto/friendlist"
+	followList "tinytiktok/user/proto/followList"
+	followerList "tinytiktok/user/proto/followerList"
+	friendList "tinytiktok/user/proto/friendList"
 	info2 "tinytiktok/user/proto/info2"
 	login "tinytiktok/user/proto/login"
-	messageact "tinytiktok/user/proto/messageact"
-	messagechat "tinytiktok/user/proto/messagechat"
+	messageAct "tinytiktok/user/proto/messageAct"
+	messageChat "tinytiktok/user/proto/messageChat"
 	register "tinytiktok/user/proto/register"
 )
 
@@ -47,17 +47,17 @@ type UserServiceClient interface {
 	Login(ctx context.Context, in *login.LoginRequest, opts ...grpc.CallOption) (*login.LoginResponse, error)
 	Info(ctx context.Context, in *info2.UserRequest, opts ...grpc.CallOption) (*info2.UserResponse, error)
 	// 关注列表
-	FollowList(ctx context.Context, in *followlist.FollowListRequest, opts ...grpc.CallOption) (*followlist.FollowListResponse, error)
+	FollowList(ctx context.Context, in *followList.FollowListRequest, opts ...grpc.CallOption) (*followList.FollowListResponse, error)
 	// 粉丝列表
-	FollowerList(ctx context.Context, in *followerlist.FollowerListRequest, opts ...grpc.CallOption) (*followerlist.FollowerListResponse, error)
+	FollowerList(ctx context.Context, in *followerList.FollowerListRequest, opts ...grpc.CallOption) (*followerList.FollowerListResponse, error)
 	// 关注操作
 	Favorite(ctx context.Context, in *focus.FavoriteRequest, opts ...grpc.CallOption) (*focus.FavoriteResponse, error)
 	// 好友列表
-	FriendList(ctx context.Context, in *friendlist.FriendListRequest, opts ...grpc.CallOption) (*friendlist.FriendListResponse, error)
+	FriendList(ctx context.Context, in *friendList.FriendListRequest, opts ...grpc.CallOption) (*friendList.FriendListResponse, error)
 	// 发送信息
-	MessageAct(ctx context.Context, in *messageact.MessageActionRequest, opts ...grpc.CallOption) (*messageact.MessageActionResponse, error)
+	MessageAct(ctx context.Context, in *messageAct.MessageActionRequest, opts ...grpc.CallOption) (*messageAct.MessageActionResponse, error)
 	// 聊天记录
-	MassageChat(ctx context.Context, in *messagechat.MessageChatRequest, opts ...grpc.CallOption) (*messagechat.MessageChatResponse, error)
+	MassageChat(ctx context.Context, in *messageChat.MessageChatRequest, opts ...grpc.CallOption) (*messageChat.MessageChatResponse, error)
 }
 
 type userServiceClient struct {
@@ -95,8 +95,8 @@ func (c *userServiceClient) Info(ctx context.Context, in *info2.UserRequest, opt
 	return out, nil
 }
 
-func (c *userServiceClient) FollowList(ctx context.Context, in *followlist.FollowListRequest, opts ...grpc.CallOption) (*followlist.FollowListResponse, error) {
-	out := new(followlist.FollowListResponse)
+func (c *userServiceClient) FollowList(ctx context.Context, in *followList.FollowListRequest, opts ...grpc.CallOption) (*followList.FollowListResponse, error) {
+	out := new(followList.FollowListResponse)
 	err := c.cc.Invoke(ctx, UserService_FollowList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -104,8 +104,8 @@ func (c *userServiceClient) FollowList(ctx context.Context, in *followlist.Follo
 	return out, nil
 }
 
-func (c *userServiceClient) FollowerList(ctx context.Context, in *followerlist.FollowerListRequest, opts ...grpc.CallOption) (*followerlist.FollowerListResponse, error) {
-	out := new(followerlist.FollowerListResponse)
+func (c *userServiceClient) FollowerList(ctx context.Context, in *followerList.FollowerListRequest, opts ...grpc.CallOption) (*followerList.FollowerListResponse, error) {
+	out := new(followerList.FollowerListResponse)
 	err := c.cc.Invoke(ctx, UserService_FollowerList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -122,8 +122,8 @@ func (c *userServiceClient) Favorite(ctx context.Context, in *focus.FavoriteRequ
 	return out, nil
 }
 
-func (c *userServiceClient) FriendList(ctx context.Context, in *friendlist.FriendListRequest, opts ...grpc.CallOption) (*friendlist.FriendListResponse, error) {
-	out := new(friendlist.FriendListResponse)
+func (c *userServiceClient) FriendList(ctx context.Context, in *friendList.FriendListRequest, opts ...grpc.CallOption) (*friendList.FriendListResponse, error) {
+	out := new(friendList.FriendListResponse)
 	err := c.cc.Invoke(ctx, UserService_FriendList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -131,8 +131,8 @@ func (c *userServiceClient) FriendList(ctx context.Context, in *friendlist.Frien
 	return out, nil
 }
 
-func (c *userServiceClient) MessageAct(ctx context.Context, in *messageact.MessageActionRequest, opts ...grpc.CallOption) (*messageact.MessageActionResponse, error) {
-	out := new(messageact.MessageActionResponse)
+func (c *userServiceClient) MessageAct(ctx context.Context, in *messageAct.MessageActionRequest, opts ...grpc.CallOption) (*messageAct.MessageActionResponse, error) {
+	out := new(messageAct.MessageActionResponse)
 	err := c.cc.Invoke(ctx, UserService_MessageAct_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -140,8 +140,8 @@ func (c *userServiceClient) MessageAct(ctx context.Context, in *messageact.Messa
 	return out, nil
 }
 
-func (c *userServiceClient) MassageChat(ctx context.Context, in *messagechat.MessageChatRequest, opts ...grpc.CallOption) (*messagechat.MessageChatResponse, error) {
-	out := new(messagechat.MessageChatResponse)
+func (c *userServiceClient) MassageChat(ctx context.Context, in *messageChat.MessageChatRequest, opts ...grpc.CallOption) (*messageChat.MessageChatResponse, error) {
+	out := new(messageChat.MessageChatResponse)
 	err := c.cc.Invoke(ctx, UserService_MassageChat_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -157,17 +157,17 @@ type UserServiceServer interface {
 	Login(context.Context, *login.LoginRequest) (*login.LoginResponse, error)
 	Info(context.Context, *info2.UserRequest) (*info2.UserResponse, error)
 	// 关注列表
-	FollowList(context.Context, *followlist.FollowListRequest) (*followlist.FollowListResponse, error)
+	FollowList(context.Context, *followList.FollowListRequest) (*followList.FollowListResponse, error)
 	// 粉丝列表
-	FollowerList(context.Context, *followerlist.FollowerListRequest) (*followerlist.FollowerListResponse, error)
+	FollowerList(context.Context, *followerList.FollowerListRequest) (*followerList.FollowerListResponse, error)
 	// 关注操作
 	Favorite(context.Context, *focus.FavoriteRequest) (*focus.FavoriteResponse, error)
 	// 好友列表
-	FriendList(context.Context, *friendlist.FriendListRequest) (*friendlist.FriendListResponse, error)
+	FriendList(context.Context, *friendList.FriendListRequest) (*friendList.FriendListResponse, error)
 	// 发送信息
-	MessageAct(context.Context, *messageact.MessageActionRequest) (*messageact.MessageActionResponse, error)
+	MessageAct(context.Context, *messageAct.MessageActionRequest) (*messageAct.MessageActionResponse, error)
 	// 聊天记录
-	MassageChat(context.Context, *messagechat.MessageChatRequest) (*messagechat.MessageChatResponse, error)
+	MassageChat(context.Context, *messageChat.MessageChatRequest) (*messageChat.MessageChatResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -184,22 +184,22 @@ func (UnimplementedUserServiceServer) Login(context.Context, *login.LoginRequest
 func (UnimplementedUserServiceServer) Info(context.Context, *info2.UserRequest) (*info2.UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Info not implemented")
 }
-func (UnimplementedUserServiceServer) FollowList(context.Context, *followlist.FollowListRequest) (*followlist.FollowListResponse, error) {
+func (UnimplementedUserServiceServer) FollowList(context.Context, *followList.FollowListRequest) (*followList.FollowListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FollowList not implemented")
 }
-func (UnimplementedUserServiceServer) FollowerList(context.Context, *followerlist.FollowerListRequest) (*followerlist.FollowerListResponse, error) {
+func (UnimplementedUserServiceServer) FollowerList(context.Context, *followerList.FollowerListRequest) (*followerList.FollowerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FollowerList not implemented")
 }
 func (UnimplementedUserServiceServer) Favorite(context.Context, *focus.FavoriteRequest) (*focus.FavoriteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Favorite not implemented")
 }
-func (UnimplementedUserServiceServer) FriendList(context.Context, *friendlist.FriendListRequest) (*friendlist.FriendListResponse, error) {
+func (UnimplementedUserServiceServer) FriendList(context.Context, *friendList.FriendListRequest) (*friendList.FriendListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FriendList not implemented")
 }
-func (UnimplementedUserServiceServer) MessageAct(context.Context, *messageact.MessageActionRequest) (*messageact.MessageActionResponse, error) {
+func (UnimplementedUserServiceServer) MessageAct(context.Context, *messageAct.MessageActionRequest) (*messageAct.MessageActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MessageAct not implemented")
 }
-func (UnimplementedUserServiceServer) MassageChat(context.Context, *messagechat.MessageChatRequest) (*messagechat.MessageChatResponse, error) {
+func (UnimplementedUserServiceServer) MassageChat(context.Context, *messageChat.MessageChatRequest) (*messageChat.MessageChatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MassageChat not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
@@ -270,7 +270,7 @@ func _UserService_Info_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _UserService_FollowList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(followlist.FollowListRequest)
+	in := new(followList.FollowListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -282,13 +282,13 @@ func _UserService_FollowList_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: UserService_FollowList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).FollowList(ctx, req.(*followlist.FollowListRequest))
+		return srv.(UserServiceServer).FollowList(ctx, req.(*followList.FollowListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_FollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(followerlist.FollowerListRequest)
+	in := new(followerList.FollowerListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -300,7 +300,7 @@ func _UserService_FollowerList_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: UserService_FollowerList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).FollowerList(ctx, req.(*followerlist.FollowerListRequest))
+		return srv.(UserServiceServer).FollowerList(ctx, req.(*followerList.FollowerListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -324,7 +324,7 @@ func _UserService_Favorite_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _UserService_FriendList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(friendlist.FriendListRequest)
+	in := new(friendList.FriendListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -336,13 +336,13 @@ func _UserService_FriendList_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: UserService_FriendList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).FriendList(ctx, req.(*friendlist.FriendListRequest))
+		return srv.(UserServiceServer).FriendList(ctx, req.(*friendList.FriendListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_MessageAct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(messageact.MessageActionRequest)
+	in := new(messageAct.MessageActionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -354,13 +354,13 @@ func _UserService_MessageAct_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: UserService_MessageAct_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).MessageAct(ctx, req.(*messageact.MessageActionRequest))
+		return srv.(UserServiceServer).MessageAct(ctx, req.(*messageAct.MessageActionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_MassageChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(messagechat.MessageChatRequest)
+	in := new(messageChat.MessageChatRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -372,7 +372,7 @@ func _UserService_MassageChat_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: UserService_MassageChat_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).MassageChat(ctx, req.(*messagechat.MessageChatRequest))
+		return srv.(UserServiceServer).MassageChat(ctx, req.(*messageChat.MessageChatRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

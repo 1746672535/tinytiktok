@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm"
 	"tinytiktok/common"
+	"tinytiktok/utils/avatar"
 	"tinytiktok/utils/consul"
 	"tinytiktok/utils/tools"
 	"tinytiktok/utils/yiyan"
@@ -92,8 +93,8 @@ func InsertUser(db *gorm.DB, username, password string) (int64, error) {
 		Salt:           salt,
 		FollowCount:    0,
 		FollowerCount:  0,
-		Avatar:         "https://example.com/avatar.png",
-		BackgroundImg:  "https://example.com/background.png",
+		Avatar:         avatar.Gen(username),
+		BackgroundImg:  "https://images.pexels.com/photos/956981/milky-way-starry-sky-night-sky-star-956981.jpeg?auto=compress&cs=tinysrgb&w=600",
 		Signature:      yiyan.GenYiYan(),
 		TotalFavorited: 0,
 		WorkCount:      0,

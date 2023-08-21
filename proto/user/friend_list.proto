@@ -1,6 +1,6 @@
 syntax = "proto3";
-package friend_list;
-option go_package = "tinytiktok/user/proto/friendlist";
+package friendList;
+option go_package = "tinytiktok/user/proto/friendList";
 
 message FriendListRequest {
   int64 user_id = 1; // 用户id

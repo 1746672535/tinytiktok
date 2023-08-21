@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"tinytiktok/utils/msg"
 )
 
 type Config struct {
@@ -20,7 +21,7 @@ func NewConfig(path, name, ty string) *Config {
 	// 尝试进行配置读取
 	err := v.ReadInConfig()
 	if err != nil {
-		panic("配置读取失败: " + err.Error())
+		panic(msg.UnableReadConfig)
 	}
 	return &Config{Viper: v}
 }

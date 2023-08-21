@@ -1,13 +1,14 @@
 package web
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+	"tinytiktok/common"
 	"tinytiktok/user/srv"
+	"tinytiktok/utils/msg"
 )
 
 type Response struct {
@@ -24,7 +25,7 @@ type ChatResponse struct {
 func MessageAct(ctx *gin.Context) {
 	// 鉴权
 	if !ctx.GetBool("auth") {
-		fmt.Println("鉴权失败")
+		common.ReturnErr(ctx, msg.AuthError)
 		return
 	}
 	toUserId := ctx.Query("to_user_id")
@@ -58,7 +59,7 @@ func MessageAct(ctx *gin.Context) {
 func MessageChat(ctx *gin.Context) {
 	// 鉴权
 	if !ctx.GetBool("auth") {
-		fmt.Println("鉴权失败")
+		common.ReturnErr(ctx, msg.AuthError)
 		return
 	}
 	loginUserId := ctx.GetInt64("userID")

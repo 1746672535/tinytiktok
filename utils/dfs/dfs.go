@@ -2,9 +2,11 @@ package dfs
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/levigross/grequests"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"strings"
 	"tinytiktok/utils/config"
@@ -43,4 +45,14 @@ func UploadFile(file *multipart.FileHeader, userID int64) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%s/group1/%s/%d/%s", FileServerURL, SavePath, userID, videoUUID), err
+}
+
+// Auth 验证 dfs-key, 防止服务器被恶意上传文件
+func Auth(ctx *gin.Context) {
+	authToken, _ := ctx.GetPostForm("auth_token")
+	if authToken != Key {
+		ctx.String(http.StatusOK, "fail")
+		return
+	}
+	ctx.String(http.StatusOK, "ok")
 }

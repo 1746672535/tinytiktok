@@ -1,0 +1,15 @@
+syntax = "proto3";
+package commentList;
+option go_package = "tinytiktok/video/proto/commentList";
+import "video/comment.proto";
+
+message CommentListRequest {
+  string token = 1; // 用户鉴权token
+  int64 video_id = 2; // 视频id
+}
+
+message CommentListResponse {
+  int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  string status_msg = 2; // 返回状态描述
+  repeated comment.Comment comment_list = 3; // 视频评论列表
+}

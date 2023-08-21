@@ -1,6 +1,6 @@
 syntax = "proto3";
 package comment;
-option go_package = "/go_workspace/tinytiktok/video/proto/comment";
+option go_package = "tinytiktok/video/proto/comment";
 import "user/info.proto";
 
 message Comment{

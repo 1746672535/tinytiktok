@@ -1,0 +1,15 @@
+# 微服务的数据库应该是独立的 该数据库存放用户信息
+User:
+  Address: 127.0.0.1
+  Port: 3306
+  Username: root
+  Password: root
+  Dbname: tinytiktok-user
+
+# 该数据库存放视频信息
+Video:
+  Address: 127.0.0.1
+  Port: 3306
+  Username: root
+  Password: root
+  Dbname: tinytiktok-video

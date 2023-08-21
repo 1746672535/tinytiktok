@@ -1,0 +1,5 @@
+# 视频保存的服务器 [文件服务器]
+SavePath: tinytiktok/video
+Key: ayH9u0lq1be8vkVmKQFR4EOJtUYGZnI5
+Host: 192.168.*.*
+Port: 8080

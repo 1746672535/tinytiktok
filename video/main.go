@@ -8,6 +8,7 @@ import (
 	"os"
 	"tinytiktok/utils/config"
 	"tinytiktok/utils/consul"
+	"tinytiktok/utils/msg"
 	"tinytiktok/utils/tools"
 	"tinytiktok/video/proto/server"
 	"tinytiktok/video/srv"
@@ -41,7 +42,7 @@ func main() {
 		},
 	})
 	if err != nil {
-		panic(fmt.Sprintf("服务注册失败: %s", err.Error()))
+		panic(msg.ServerRegisterError + err.Error())
 	}
 	// 延迟注销服务
 	defer reg.DeRegister(id)

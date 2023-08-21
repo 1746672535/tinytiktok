@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -59,19 +58,11 @@ func UpdateCount(db *gorm.DB, userId, toUserId int64, isFavorite bool) error {
 	var user2 User
 	result1 := db.First(&user1, userId)
 	if result1.Error != nil {
-		if errors.Is(result1.Error, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("user with ID %d not found", userId)
-		} else {
-			return result1.Error
-		}
+		return result1.Error
 	}
 	result2 := db.First(&user2, toUserId)
 	if result2.Error != nil {
-		if errors.Is(result2.Error, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("user with ID %d not found", toUserId)
-		} else {
-			return result2.Error
-		}
+		return result2.Error
 	}
 
 	// 关注操作
