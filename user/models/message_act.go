@@ -18,12 +18,12 @@ func (Message) TableName() string {
 	return "message"
 }
 
-func SendMessage(db *gorm.DB, fromUserId int64, toUserId int64, content string, actionType int64) error {
+func MessageAct(db *gorm.DB, UserId int64, ToUserId int64, ActionType int64, Content string) error {
 	message := Message{
-		UserId:     fromUserId,
-		ReceiverId: toUserId,
-		ActionType: actionType,
-		MsgContent: content,
+		UserId:     UserId,
+		ReceiverId: ToUserId,
+		ActionType: ActionType,
+		MsgContent: Content,
 	}
 	result := db.Save(&message)
 	if result.Error != nil {

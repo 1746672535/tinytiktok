@@ -4,9 +4,10 @@ option go_package = "tinytiktok/user/proto/messageAct";
 
 message MessageActionRequest {
   string token = 1; // 用户鉴权token
-  int64 to_user_id = 2; // 对方用户id
-  int32 action_type = 3; // 1-发送消息
+  int64 user_id = 2; // 用户id
+  int64 to_user_id = 3; // 对方用户id
   string content = 4; // 消息内容
+  int64 action_type = 5; // 1-发送消息
 }
 
 message MessageActionResponse {

@@ -1,40 +1,23 @@
 package srv
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
 	"log"
-	"net/http"
-	"strconv"
 	"tinytiktok/user/models"
 	"tinytiktok/user/proto/messageAct"
 	"tinytiktok/utils/msg"
 )
 
-func MessageAct(ctx *gin.Context) {
-	// 获取参数
-	fromUserId := ctx.GetInt64("userID")
-	toUserId := ctx.Query("to_user_id")
-	content := ctx.Query("content")
-	actionType := ctx.Query("action_type")
-	targetUserId, err := strconv.ParseInt(toUserId, 10, 64)
-	if err != nil {
-		log.Println("Error parsing toUserId:", err)
-		ctx.JSON(http.StatusBadRequest, messageAct.MessageActionResponse{StatusCode: msg.Fail, StatusMsg: "Invalid toUserId"})
-		return
-	}
-	targetActionType, err1 := strconv.ParseInt(actionType, 10, 64)
-	if err1 != nil {
-		log.Println("Error parsing actionType:", err)
-		ctx.JSON(http.StatusBadRequest, messageAct.MessageActionResponse{StatusCode: msg.Fail, StatusMsg: "Invalid actionType"})
-		return
-	}
-
-	err = models.SendMessage(UserDb, fromUserId, targetUserId, content, targetActionType)
+func (h *Handle) MessageAct(ctx context.Context, req *messageAct.MessageActionRequest) (rsp *messageAct.MessageActionResponse, err error) {
+	rsp = &messageAct.MessageActionResponse{}
+	err = models.MessageAct(UserDb, req.UserId, req.ToUserId, req.ActionType, req.Content)
 	if err != nil {
 		log.Println("Error sending message:", err)
-		ctx.JSON(http.StatusInternalServerError, messageAct.MessageActionResponse{StatusCode: msg.Fail, StatusMsg: "Send Message 接口错误"})
-		return
+		rsp.StatusMsg = "Send Message 接口错误"
+		rsp.StatusCode = msg.Fail
+		return rsp, nil
 	}
-
-	ctx.JSON(http.StatusOK, messageAct.MessageActionResponse{StatusCode: msg.Success, StatusMsg: "消息发送成功"})
+	rsp.StatusMsg = msg.Ok
+	rsp.StatusCode = msg.Success
+	return rsp, nil
 }
