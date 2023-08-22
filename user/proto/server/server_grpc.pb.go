@@ -36,7 +36,7 @@ const (
 	UserService_Favorite_FullMethodName     = "/userServer.UserService/Favorite"
 	UserService_FriendList_FullMethodName   = "/userServer.UserService/FriendList"
 	UserService_MessageAct_FullMethodName   = "/userServer.UserService/MessageAct"
-	UserService_MassageChat_FullMethodName  = "/userServer.UserService/MassageChat"
+	UserService_MessageChat_FullMethodName  = "/userServer.UserService/MessageChat"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -57,7 +57,7 @@ type UserServiceClient interface {
 	// 发送信息
 	MessageAct(ctx context.Context, in *messageAct.MessageActionRequest, opts ...grpc.CallOption) (*messageAct.MessageActionResponse, error)
 	// 聊天记录
-	MassageChat(ctx context.Context, in *messageChat.MessageChatRequest, opts ...grpc.CallOption) (*messageChat.MessageChatResponse, error)
+	MessageChat(ctx context.Context, in *messageChat.MessageChatRequest, opts ...grpc.CallOption) (*messageChat.MessageChatResponse, error)
 }
 
 type userServiceClient struct {
@@ -140,9 +140,9 @@ func (c *userServiceClient) MessageAct(ctx context.Context, in *messageAct.Messa
 	return out, nil
 }
 
-func (c *userServiceClient) MassageChat(ctx context.Context, in *messageChat.MessageChatRequest, opts ...grpc.CallOption) (*messageChat.MessageChatResponse, error) {
+func (c *userServiceClient) MessageChat(ctx context.Context, in *messageChat.MessageChatRequest, opts ...grpc.CallOption) (*messageChat.MessageChatResponse, error) {
 	out := new(messageChat.MessageChatResponse)
-	err := c.cc.Invoke(ctx, UserService_MassageChat_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_MessageChat_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ type UserServiceServer interface {
 	// 发送信息
 	MessageAct(context.Context, *messageAct.MessageActionRequest) (*messageAct.MessageActionResponse, error)
 	// 聊天记录
-	MassageChat(context.Context, *messageChat.MessageChatRequest) (*messageChat.MessageChatResponse, error)
+	MessageChat(context.Context, *messageChat.MessageChatRequest) (*messageChat.MessageChatResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -199,8 +199,8 @@ func (UnimplementedUserServiceServer) FriendList(context.Context, *friendList.Fr
 func (UnimplementedUserServiceServer) MessageAct(context.Context, *messageAct.MessageActionRequest) (*messageAct.MessageActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MessageAct not implemented")
 }
-func (UnimplementedUserServiceServer) MassageChat(context.Context, *messageChat.MessageChatRequest) (*messageChat.MessageChatResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MassageChat not implemented")
+func (UnimplementedUserServiceServer) MessageChat(context.Context, *messageChat.MessageChatRequest) (*messageChat.MessageChatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MessageChat not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -359,20 +359,20 @@ func _UserService_MessageAct_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_MassageChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_MessageChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(messageChat.MessageChatRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).MassageChat(ctx, in)
+		return srv.(UserServiceServer).MessageChat(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_MassageChat_FullMethodName,
+		FullMethod: UserService_MessageChat_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).MassageChat(ctx, req.(*messageChat.MessageChatRequest))
+		return srv.(UserServiceServer).MessageChat(ctx, req.(*messageChat.MessageChatRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -417,8 +417,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_MessageAct_Handler,
 		},
 		{
-			MethodName: "MassageChat",
-			Handler:    _UserService_MassageChat_Handler,
+			MethodName: "MessageChat",
+			Handler:    _UserService_MessageChat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

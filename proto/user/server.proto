@@ -26,5 +26,5 @@ service UserService {
   //发送信息
   rpc MessageAct (messageAct.MessageActionRequest) returns (messageAct.MessageActionResponse);
   //聊天记录
-  rpc MassageChat (messageChat.MessageChatRequest) returns (messageChat.MessageChatResponse);
+  rpc MessageChat (messageChat.MessageChatRequest) returns (messageChat.MessageChatResponse);
 }

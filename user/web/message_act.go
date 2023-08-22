@@ -22,7 +22,6 @@ func MessageAct(ctx *gin.Context) {
 	}
 	userID := ctx.GetInt64("userID")
 	toUserId := ctx.Query("to_user_id")
-	//toUserIdInt, _ := strconv.Atoi(toUserId)
 	content := ctx.Query("content")
 	actionType := ctx.Query("action_type")
 	targetUserId, err := strconv.ParseInt(toUserId, 10, 64)
@@ -43,24 +42,12 @@ func MessageAct(ctx *gin.Context) {
 	conn := consul.GetClientConn("user-srv")
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
-	rsp, err := client.MessageAct(metadata.NewOutgoingContext(context.Background(), md), &messageAct.MessageActionRequest{
+	rsp, _ := client.MessageAct(metadata.NewOutgoingContext(context.Background(), md), &messageAct.MessageActionRequest{
 		UserId:     userID,
 		ToUserId:   targetUserId,
 		Content:    content,
 		ActionType: targetActionType,
 	})
-
-	if err != nil {
-		// 处理错误，例如打印错误日志
-		log.Printf("Error calling gRPC service: %v", err)
-
-		// 返回适当的错误响应
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"status_code": msg.Fail,
-			"status_msg":  "Error calling gRPC service",
-		})
-		return
-	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"status_code": rsp.StatusCode,

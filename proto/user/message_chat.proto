@@ -4,8 +4,9 @@ option go_package = "tinytiktok/user/proto/messageChat";
 
 message MessageChatRequest {
   string token = 1; // 用户鉴权token
-  int64 to_user_id = 2; // 对方用户id
-  int64 pre_msg_time = 3;//上次最新消息的时间（新增字段-apk更新中）
+  int64 user_id = 2; // 用户id
+  int64 to_user_id = 3; // 对方用户id
+  int64 pre_msg_time = 4;//上次最新消息的时间（新增字段-apk更新中）
 }
 
 message MessageChatResponse {

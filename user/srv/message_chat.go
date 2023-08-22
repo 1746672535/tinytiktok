@@ -1,9 +1,8 @@
 package srv
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
 	"log"
-	"net/http"
 	"strconv"
 	"time"
 	"tinytiktok/user/models"
@@ -11,36 +10,15 @@ import (
 	"tinytiktok/utils/msg"
 )
 
-func MessageChat(ctx *gin.Context) {
-	// 获取参数
-	loginUserId := ctx.GetInt64("userID")
-	toUserId := ctx.Query("to_user_id")
-	preMsgTime := ctx.Query("pre_msg_time")
-	var latestTime time.Time
-	if preMsgTime == "" {
-		latestTime = time.Time{}
-	} else {
-		covPreMsgTime, err := strconv.ParseInt(preMsgTime, 10, 64)
-		if err != nil {
-			log.Println("preMsgTime 参数错误")
-			ctx.JSON(http.StatusBadRequest, gin.H{"status_code": msg.Fail, "status_msg": "Invalid preMsgTime"})
-			return
-		}
-		latestTime = time.Unix(covPreMsgTime, 0).Add(1 * time.Second)
-	}
-	targetUserId, err := strconv.ParseInt(toUserId, 10, 64)
-	if err != nil {
-		log.Println("toUserId 参数错误")
-		ctx.JSON(http.StatusBadRequest, gin.H{"status_code": msg.Fail, "status_msg": "Invalid toUserId"})
-		return
-	}
-
-	// 获取消息
+func (h *Handle) MessageChat(ctx context.Context, req *messageChat.MessageChatRequest) (rsp *messageChat.MessageChatResponse, err error) {
+	rsp = &messageChat.MessageChatResponse{}
 	messages := make([]models.ChatMessage, 0, 10)
-	plainMessages, err := models.MessageChat(UserDb, loginUserId, targetUserId, latestTime)
+	plainMessages, err := models.MessageChat(UserDb, req.UserId, req.ToUserId, time.Unix(req.PreMsgTime, 0))
 	if err != nil {
 		log.Println("MessageChat Service:", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"status_code": msg.Fail, "status_msg": err.Error()})
+		rsp.StatusMsg = err.Error()
+		rsp.StatusCode = msg.Fail
+		return rsp, nil
 		return
 	}
 	for _, tmpMessage := range plainMessages {
@@ -65,10 +43,8 @@ func MessageChat(ctx *gin.Context) {
 			CreateTime: createTimeStr,
 		})
 	}
-	response := &messageChat.MessageChatResponse{
-		StatusCode:  msg.Success,
-		StatusMsg:   "获取消息成功",
-		MessageList: messageList,
-	}
-	ctx.JSON(http.StatusOK, response)
+	rsp.StatusMsg = msg.Ok
+	rsp.StatusCode = msg.Success
+	rsp.MessageList = messageList
+	return rsp, nil
 }
