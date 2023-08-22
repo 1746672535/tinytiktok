@@ -51,9 +51,8 @@ func CalcFavoriteCountByVideoID(db *gorm.DB, videoID int64, isFavorite bool) err
 func IsUserLikedVideo(db *gorm.DB, userID, videoID int64) (bool, error) {
 	var likeCache LikeCache
 	key := redis.Key("like", userID, videoID)
-	// 查询redis
-	err := redis.GetHash(key, &likeCache)
-	if err != nil {
+	// 查询redis, 如果没有出错则说明在redis中拿到了数据
+	if err := redis.GetHash(key, &likeCache); err == nil {
 		return likeCache.State, nil
 	}
 	// 查询redis失败则说明在redis中找不到点赞记录, 那么开始查询数据库并将结果同步至redis中

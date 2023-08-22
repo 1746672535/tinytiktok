@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
 	"os"
@@ -62,6 +63,10 @@ func HSet(key, filed string, value any) error {
 
 // HGet 获取key中某一个字段的值
 func HGet(key, field string) (any, error) {
+	// 先判断key是否存在
+	if exist, err := Exists(key); !exist || err != nil {
+		return "", errors.New("key is not exist")
+	}
 	data := Client.HGet(key, field)
 	return restoreValue(data.Val()), data.Err()
 }
@@ -78,6 +83,10 @@ func PutHash(key string, obj any) error {
 
 // GetHash 根据key获取结构体数据
 func GetHash(key string, obj any) error {
+	// 先判断key是否存在
+	if exist, err := Exists(key); !exist || err != nil {
+		return errors.New("key is not exist")
+	}
 	data := Client.HGetAll(key)
 	if data.Err() != nil {
 		return data.Err()
