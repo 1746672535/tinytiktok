@@ -11,9 +11,8 @@ func (h *Handle) FriendList(ctx context.Context, req *friendList.FriendListReque
 	rsp := friendList.FriendListResponse{}
 	users := models.GetFriendList(UserDb, req.UserId)
 	var friendUsers []*friendList.FriendUser
-	messageService := GetMessageServiceInstance()
 	for _, v := range users {
-		messageInfo, err := messageService.LatestMessage(req.UserId, v.ID)
+		messageInfo, err := models.LatestMessage(UserDb, req.UserId, v.ID)
 		if err != nil {
 			if err.Error() != "record not found" {
 				continue
