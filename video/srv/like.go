@@ -24,22 +24,21 @@ func FlushLikeDataToMysql() {
 		if !strings.Contains(key, "like") {
 			continue
 		}
-		l := &models.Like{}
+		l := &models.LikeCache{}
 		_ = redis.GetHash(key, l)
 		// 如果数据变动
 		if l.IsEdit {
 			_ = models.LikeVideo(VideoDb, l.UserID, l.VideoID, l.State)
 			// 在刷新数据之后,将edit赋值为false, 避免重复写入数据库
-			l.IsEdit = false
-			_ = redis.PutHash(key, l)
+			_ = redis.HSet(key, "IsEdit", false)
 		}
 	}
 }
 
 func init() {
+	ticker := time.NewTicker(time.Duration(redis.RefreshTime) * time.Second)
 	go func() {
-		for {
-			time.Sleep(time.Duration(redis.RefreshTime) * time.Second)
+		for range ticker.C {
 			FlushLikeDataToMysql()
 		}
 	}()
@@ -54,7 +53,6 @@ func (h *Handle) Like(ctx context.Context, req *like.LikeRequest) (rsp *like.Lik
 		UserID:  req.UserId,
 		VideoID: req.VideoId,
 		State:   isFavorite,
-		Table:   "likes",
 		// edit赋值为true, 表示该值已被更新, 请刷新至数据库
 		IsEdit: true,
 	})

@@ -82,7 +82,7 @@ func (messageService *MessageServiceImpl) LatestMessage(loginUserId int64, targe
 }
 
 func (messageService *MessageServiceImpl) SendMessageRequest(ctx *gin.Context) {
-	//获取参数
+	// 获取参数
 	fromUserId := ctx.GetInt64("userID")
 	toUserId := ctx.Query("to_user_id")
 	content := ctx.Query("content")

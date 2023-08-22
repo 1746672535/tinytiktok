@@ -14,16 +14,12 @@ type Like struct {
 	UserID  int64 `gorm:"column:user_id" json:"user_id"`
 	VideoID int64 `gorm:"column:video_id" json:"video_id"`
 	State   bool  `gorm:"column:state" json:"state"`
-	// 用于redis同步数据库
-	Table  string `gorm:"-"`
-	IsEdit bool   `gorm:"-"`
 }
 
 type LikeCache struct {
 	UserID  int64
 	VideoID int64
 	State   bool
-	Table   string
 	IsEdit  bool
 }
 
@@ -77,7 +73,6 @@ func IsUserLikedVideo(db *gorm.DB, userID, videoID int64) (bool, error) {
 		UserID:  like.UserID,
 		VideoID: like.VideoID,
 		State:   like.State,
-		Table:   "like",
 		IsEdit:  false,
 	})
 	// 找到记录，表示用户已点赞该视频
