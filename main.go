@@ -16,7 +16,7 @@ import (
 func main() {
 	router := gin.New()
 	// 注册中间件
-	router.Use(jwt.Auth(), gin.Logger(), gin.CustomRecovery(func(c *gin.Context, err any) {
+	router.Use(gin.Logger(), jwt.Auth(), gin.CustomRecovery(func(c *gin.Context, err any) {
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": msg.Fail,
 			"status_msg":  msg.ServerError,
@@ -63,19 +63,4 @@ func main() {
 	router.GET("/douyin/comment/list/", videoWeb.CommentList)
 	// 启动服务
 	_ = router.Run(fmt.Sprintf(":%d", cfg.ReadInt("Server.Port")))
-}
-
-func CatchError() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			if err := recover(); err != nil {
-				c.Abort()
-				c.JSON(http.StatusOK, gin.H{
-					"status_code": msg.Fail,
-					"status_msg":  msg.ServerError,
-				})
-			}
-		}()
-		c.Next()
-	}
 }

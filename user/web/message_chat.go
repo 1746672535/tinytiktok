@@ -45,7 +45,10 @@ func MessageChat(ctx *gin.Context) {
 
 	md := metadata.Pairs()
 	// 访问srv层
-	conn := consul.GetClientConn("user-srv")
+	conn := consul.GetClientConn(common.UserServer, userId)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	rsp, _ := client.MessageChat(metadata.NewOutgoingContext(context.Background(), md), &messageChat.MessageChatRequest{
