@@ -26,6 +26,9 @@ func UserRegister(ctx *gin.Context) {
 	md := metadata.Pairs()
 	// 向srv层发送请求
 	conn := consul.GetClientConn(common.UserServer)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	rsp, err := client.Register(metadata.NewOutgoingContext(context.Background(), md), &register.RegisterRequest{

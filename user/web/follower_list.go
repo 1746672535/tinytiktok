@@ -29,7 +29,10 @@ func FollowerList(ctx *gin.Context) {
 	}
 	md := metadata.Pairs()
 	// 访问srv层
-	conn := consul.GetClientConn("user-srv")
+	conn := consul.GetClientConn(common.UserServer, int64(userID))
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	rsp, _ := client.FollowerList(metadata.NewOutgoingContext(context.Background(), md), &followerList.FollowerListRequest{

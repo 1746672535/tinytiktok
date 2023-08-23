@@ -30,7 +30,10 @@ func Feed(ctx *gin.Context) {
 
 	// 请求srv层
 	md := metadata.Pairs()
-	conn := consul.GetClientConn("video-srv")
+	conn := consul.GetClientConn(common.VideoServer, userID)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, err := client.Feed(metadata.NewOutgoingContext(context.Background(), md), &feed.FeedRequest{

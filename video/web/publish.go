@@ -27,7 +27,10 @@ func Publish(ctx *gin.Context) {
 	url, _ := dfs.UploadFile(file, userID)
 	// 将请求转发到srv层
 	md := metadata.Pairs()
-	conn := consul.GetClientConn("video-srv")
+	conn := consul.GetClientConn(common.VideoServer, userID)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, _ := client.Publish(metadata.NewOutgoingContext(context.Background(), md), &publish.PublishRequest{
@@ -55,7 +58,10 @@ func PublishList(ctx *gin.Context) {
 
 	// 将请求转发到srv层
 	md := metadata.Pairs()
-	conn := consul.GetClientConn("video-srv")
+	conn := consul.GetClientConn(common.VideoServer, userID)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, err := client.PublishList(metadata.NewOutgoingContext(context.Background(), md), &publish.PublishListRequest{

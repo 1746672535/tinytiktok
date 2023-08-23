@@ -23,7 +23,10 @@ func CommentList(ctx *gin.Context) {
 	videoIDInt, err := strconv.Atoi(videoID)
 	// 访问srv层
 	md := metadata.Pairs()
-	conn := consul.GetClientConn("video-srv")
+	conn := consul.GetClientConn(common.VideoServer)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, err := client.CommentList(metadata.NewOutgoingContext(context.Background(), md), &commentList.CommentListRequest{

@@ -3,17 +3,26 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"os"
 	userWeb "tinytiktok/user/web"
 	"tinytiktok/utils/config"
 	"tinytiktok/utils/dfs"
 	"tinytiktok/utils/jwt"
+	"tinytiktok/utils/msg"
 	videoWeb "tinytiktok/video/web"
 )
 
 func main() {
-	router := gin.Default()
-	router.Use(jwt.Auth())
+	router := gin.New()
+	// 注册中间件
+	router.Use(jwt.Auth(), gin.Logger(), gin.CustomRecovery(func(c *gin.Context, err any) {
+		c.JSON(http.StatusOK, gin.H{
+			"status_code": msg.Fail,
+			"status_msg":  msg.ServerError,
+		})
+		c.Abort()
+	}))
 	// config
 	path := os.Getenv("APP")
 	cfg := config.NewConfig(fmt.Sprintf("%s/config", path), "server.yaml", "yaml")
@@ -54,4 +63,19 @@ func main() {
 	router.GET("/douyin/comment/list/", videoWeb.CommentList)
 	// 启动服务
 	_ = router.Run(fmt.Sprintf(":%d", cfg.ReadInt("Server.Port")))
+}
+
+func CatchError() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				c.Abort()
+				c.JSON(http.StatusOK, gin.H{
+					"status_code": msg.Fail,
+					"status_msg":  msg.ServerError,
+				})
+			}
+		}()
+		c.Next()
+	}
 }

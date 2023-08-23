@@ -31,7 +31,10 @@ func UserInfo(ctx *gin.Context) {
 	// md
 	md := metadata.Pairs()
 	// 向srv层发送请求
-	conn := consul.GetClientConn(common.UserServer)
+	conn := consul.GetClientConn(common.UserServer, int64(userID))
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	// 发送请求

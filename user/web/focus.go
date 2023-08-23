@@ -26,7 +26,10 @@ func Favorite(ctx *gin.Context) {
 	actionType, _ := strconv.Atoi(ctx.DefaultQuery("action_type", "-1"))
 
 	// 访问srv层
-	conn := consul.GetClientConn("user-srv")
+	conn := consul.GetClientConn(common.UserServer, userId)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 
 	client := server.NewUserServiceClient(conn)

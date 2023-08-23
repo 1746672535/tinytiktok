@@ -22,7 +22,10 @@ func FriendList(ctx *gin.Context) {
 	userID := ctx.GetInt64("userID")
 	md := metadata.Pairs()
 	// 访问srv层
-	conn := consul.GetClientConn("user-srv")
+	conn := consul.GetClientConn(common.UserServer, userID)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	rsp, _ := client.FriendList(metadata.NewOutgoingContext(context.Background(), md), &friendList.FriendListRequest{

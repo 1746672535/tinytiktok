@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"google.golang.org/grpc/metadata"
 	"gorm.io/gorm"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"tinytiktok/user/proto/info2"
 	"tinytiktok/user/proto/server"
 	"tinytiktok/utils/consul"
+	"tinytiktok/utils/msg"
 )
 
 type Video struct {
@@ -28,7 +30,10 @@ func (v Video) TableName() string {
 
 // GetUserInfo 根据id查找用户
 func GetUserInfo(userId int64) (user *info2.User, err error) {
-	conn := consul.GetClientConn(common.UserServer)
+	conn := consul.GetClientConn(common.UserServer, userId)
+	if conn == nil {
+		return nil, errors.New(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewUserServiceClient(conn)
 	// 发送请求

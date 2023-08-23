@@ -2,6 +2,7 @@ package msg
 
 var (
 	ServerRegisterError = "服务注册失败"
+	ServerFindError     = "服务发现失败"
 	ParameterError      = "参数错误"
 	ServerError         = "服务器错误"
 	JwtError            = "无法获取jwt"

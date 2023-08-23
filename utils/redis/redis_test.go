@@ -73,3 +73,10 @@ func TestReflect(t *testing.T) {
 	mapToStruct(&p, newPersonMap)
 	fmt.Println(p)
 }
+
+func TestRedisKey(t *testing.T) {
+	err := GetHash("kk", &Person{})
+	if err != nil {
+		fmt.Println(err)
+	}
+}

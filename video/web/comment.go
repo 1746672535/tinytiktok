@@ -40,7 +40,10 @@ func Comment(ctx *gin.Context) {
 
 	// 访问srv层
 	// TODO 请重写该方法, 评论应该缓存至内存或redis中并延迟提交至数据库[防止用户在短时间内频繁点赞或取消点赞]
-	conn := consul.GetClientConn(common.VideoServer)
+	conn := consul.GetClientConn(common.VideoServer, userID)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 

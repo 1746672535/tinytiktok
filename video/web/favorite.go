@@ -24,7 +24,10 @@ func Favorite(ctx *gin.Context) {
 
 	// 访问srv层
 	md := metadata.Pairs()
-	conn := consul.GetClientConn("video-srv")
+	conn := consul.GetClientConn(common.VideoServer, userID)
+	if conn == nil {
+		panic(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	rsp, err := client.FavoriteList(metadata.NewOutgoingContext(context.Background(), md), &favorite.FavoriteListRequest{

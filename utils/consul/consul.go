@@ -1,11 +1,16 @@
 package consul
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"errors"
 	"fmt"
 	"github.com/awnumar/fastrand"
 	"github.com/hashicorp/consul/api"
+	"math"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"tinytiktok/utils/config"
 )
@@ -39,6 +44,12 @@ type Server struct {
 	Tags    []string
 	// 健康检查
 	HealthCheck HealthCheck
+}
+
+type ServerInfo struct {
+	Address string
+	Port    int
+	Weight  int
 }
 
 type Registry struct {
@@ -118,7 +129,84 @@ func (r *Registry) FindService(ServerName string) (*api.AgentService, error) {
 	// 返回结果
 	var result []*api.AgentService
 	for _, service := range data {
+		// 检查服务的状态
+		checks, _, err := client.Agent().AgentHealthServiceByID(service.ID)
+		if err != nil {
+			return nil, errors.New("no service")
+		}
+		if checks != "passing" {
+			continue
+		}
 		result = append(result, service)
 	}
+	if len(result) == 0 {
+		return nil, errors.New("no service")
+	}
 	return result[fastrand.Intn(len(result))], nil
+}
+
+// FindServiceList 返回服务列表
+func (r *Registry) FindServiceList(ServerName string) ([]*api.AgentService, error) {
+	// 加载客户端
+	client, _ := api.NewClient(&r.Config)
+	// 获取服务
+	data, err := client.Agent().ServicesWithFilter(fmt.Sprintf(`Service == "%v"`, ServerName))
+	if err != nil {
+		return nil, err
+	}
+	// 返回结果
+	var result []*api.AgentService
+	for _, service := range data {
+		// 检查服务的状态
+		checks, _, err := client.Agent().AgentHealthServiceByID(service.ID)
+		if err != nil {
+			return nil, errors.New("no service")
+		}
+		if checks != "passing" {
+			continue
+		}
+		result = append(result, service)
+	}
+	if len(result) == 0 {
+		return nil, errors.New("no service")
+	}
+	return result, nil
+}
+
+// 调度算法
+// note 将服务的id和用户的id hash成一个0-1的浮点数[hash的值是固定的, 仅与id相关], 这样我们就可以使得一个用户固定的访问其中一个实例
+func hashIntToFloat(value int) float64 {
+	// 将整数转换为字符串
+	strValue := strconv.Itoa(value)
+	// 使用哈希函数计算字符串的哈希值
+	const prime32 = uint32(16777619)
+	hash := uint32(2166136261)
+	for i := 0; i < len(strValue); i++ {
+		hash ^= uint32(strValue[i])
+		hash *= prime32
+	}
+	hashValue := hash
+	// 将哈希值映射到 0 到 1 之间的浮点数范围, 这里使用的是简单的线性映射
+	floatValue := float64(hashValue) / math.MaxUint32
+	return floatValue
+}
+func hashUUIDToFloat(uuid string) float64 {
+	// 将 UUID 字符串转换为字节数组
+	uuidBytes := []byte(uuid)
+	// 使用 SHA-256 哈希算法对字节数组进行哈希
+	hashBytes := sha256.Sum256(uuidBytes)
+	// 将哈希结果解释为一个大整数
+	hashInt := binary.BigEndian.Uint64(hashBytes[:])
+	// 将大整数映射到 0 到 1 之间的浮点数范围, 这里使用的是简单的线性映射
+	floatValue := float64(hashInt) / math.MaxUint64
+	return floatValue
+}
+func findClosestGreater(A float64, B []float64) float64 {
+	closest := math.MaxFloat64
+	for _, num := range B {
+		if num > A && num < closest {
+			closest = num
+		}
+	}
+	return closest
 }

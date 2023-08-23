@@ -8,6 +8,7 @@ import (
 	"tinytiktok/common"
 	"tinytiktok/utils/avatar"
 	"tinytiktok/utils/consul"
+	"tinytiktok/utils/msg"
 	"tinytiktok/utils/tools"
 	"tinytiktok/utils/yiyan"
 	"tinytiktok/video/proto/detail"
@@ -53,7 +54,10 @@ func GetUserInfo(db *gorm.DB, userID int64) (*User, error) {
 
 // GetDetail 获取用户有关视频的详细信息
 func GetDetail(userID int64) (*detail.Detail, error) {
-	conn := consul.GetClientConn(common.VideoServer)
+	conn := consul.GetClientConn(common.VideoServer, userID)
+	if conn == nil {
+		return nil, errors.New(msg.ServerFindError)
+	}
 	defer conn.Close()
 	client := server.NewVideoServiceClient(conn)
 	// 发送请求
