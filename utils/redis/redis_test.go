@@ -42,7 +42,7 @@ func TestSetAndGet(t *testing.T) {
 
 func TestSetAddAndGet(t *testing.T) {
 	// 存储数据
-	data := []any{"alice", 18, true}
+	data := []int{6, 7, 8, 9}
 	_ = SAdd("test", data)
 	// 读取数据
 	data2, _ := SGet("test")
@@ -56,6 +56,12 @@ func TestZSetAddAndGet(t *testing.T) {
 	// 读取数据
 	data2, _ := ZGet("z_test")
 	fmt.Println(data2)
+	// 追加数据 - 请避免 true 和 1 混搅
+	appendData := []int64{1, 2, 3}
+	_ = ZAppend("z_test", appendData)
+	// 读取数据
+	data3, _ := ZGet("z_test")
+	fmt.Println(data3)
 }
 
 func TestHashSetAndGet(t *testing.T) {

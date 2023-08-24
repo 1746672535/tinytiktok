@@ -81,8 +81,15 @@ func Exists(key string) (bool, error) {
 }
 
 // SAdd 存储集合
-func SAdd(key string, data []any) error {
-	return Client.SAdd(key, data...).Err()
+func SAdd[K int | int64 | float64 | string | bool | any](key string, data []K) error {
+	values := make([]any, len(data))
+	for i, item := range data {
+		values[i] = item
+	}
+	if err := Client.SAdd(key, values...).Err(); err != nil {
+		return err
+	}
+	return Client.Expire(key, time.Duration(ExpireTime)*time.Second).Err()
 }
 
 // SGet 读取集合
@@ -91,16 +98,44 @@ func SGet(key string) ([]string, error) {
 }
 
 // ZAdd 添加有序集合 - 请在传递数据之前排序
-func ZAdd(key string, data []any) error {
+func ZAdd[K int | int64 | float64 | string | bool | any](key string, data []K) error {
+	values := make([]any, len(data))
+	for i, item := range data {
+		values[i] = item
+	}
 	var zData []redis.Z
-	for i, d := range data {
+	for i, d := range values {
 		zData = append(zData, redis.Z{
-			Score:  float64(2 * i),
+			Score:  float64(i),
 			Member: d,
 		})
 	}
 	// 使用ZAdd方法将ZSET数据存储到Redis中
-	return Client.ZAdd(key, zData...).Err()
+	if err := Client.ZAdd(key, zData...).Err(); err != nil {
+		return err
+	}
+	return Client.Expire(key, time.Duration(ExpireTime)*time.Second).Err()
+}
+
+// ZAppend 有序集合向后追加
+func ZAppend[K int | int64 | float64 | string | bool | any](key string, data []K) error {
+	values := make([]any, len(data))
+	for i, item := range data {
+		values[i] = item
+	}
+	var zData []redis.Z
+	scoreStart := int(Client.ZCard(key).Val())
+	for i, d := range values {
+		zData = append(zData, redis.Z{
+			Score:  float64(scoreStart + i),
+			Member: d,
+		})
+	}
+	// 使用ZAdd方法将ZSET数据存储到Redis中 - 追加数据应该延长数据过期时间
+	if err := Client.ZAdd(key, zData...).Err(); err != nil {
+		return err
+	}
+	return Client.Expire(key, time.Duration(ExpireTime)*time.Second).Err()
 }
 
 // ZGet 读取有序集合
