@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
+	jsoniter "github.com/json-iterator/go"
 	"os"
 	"reflect"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"tinytiktok/utils/config"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var Client *redis.Client
 var RefreshTime int
 var ExpireTime int
@@ -34,12 +36,34 @@ func init() {
 	})
 }
 
+// Key 生成Redis的key
 func Key(keys ...any) string {
 	joinedStr := ""
 	for _, value := range keys {
 		joinedStr += fmt.Sprintf("%v-", value)
 	}
 	return joinedStr[:len(joinedStr)-1]
+}
+
+// Set 存储任意数据结构 - 将结构体数据转换为json
+func Set(key string, data any) error {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	if Client.Set(key, string(jsonData), time.Duration(ExpireTime)*time.Second).Err() != nil {
+		return err
+	}
+	return nil
+}
+
+// Get 获取任意数据结构 - 将json数据转换为结构体
+func Get(key string, dataStruct any) error {
+	data, err := Client.Get(key).Result()
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal([]byte(data), &dataStruct)
 }
 
 // Del 删除redis的数据
@@ -115,13 +139,9 @@ func structToMap(obj interface{}) map[string]interface{} {
 	return result
 }
 
-// 将map转换为结构体 note 请务必传递指针类型数据, 否则将导致程序崩溃
+// 将map转换为结构体
 func mapToStruct(obj any, data map[string]interface{}) any {
 	objValue := reflect.ValueOf(obj)
-	// 检查是否为指针类型
-	if objValue.Kind() != reflect.Ptr {
-		panic("请传递指针类型数据")
-	}
 	// 使用反射获取结构体类型
 	objType := reflect.TypeOf(obj).Elem()
 	// 使用反射设置结构体字段的值

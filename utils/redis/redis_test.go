@@ -5,26 +5,46 @@ import (
 	"testing"
 )
 
+type Address struct {
+	Country   string
+	Provinces string
+	City      string
+}
+
 type Person struct {
 	Name    string
 	Age     int
 	IsStu   bool
-	Country string
+	Address Address
 }
 
 type Person2 struct {
-	Name    string
-	Age     int
-	IsStu   bool
-	Country string
+	Name  string
+	Age   int
+	IsStu bool
 }
 
-func TestRedis(t *testing.T) {
+func TestSetAndGet(t *testing.T) {
+	_ = Set(Key("user", 1, 1), Person{
+		Name:  "Alice",
+		Age:   18,
+		IsStu: true,
+		Address: Address{
+			Country:   "USA",
+			Provinces: "State of New York",
+			City:      "NewYork",
+		},
+	})
+	p := Person{}
+	_ = Get(Key("user", 1, 1), &p)
+	fmt.Println(p.Address.Provinces)
+}
+
+func TestHashSetAndGet(t *testing.T) {
 	p1 := Person{
-		Name:    "Alice",
-		Age:     24,
-		IsStu:   true,
-		Country: "USA",
+		Name:  "Alice",
+		Age:   24,
+		IsStu: true,
 	}
 	// note 尽量使用指针类型传递值
 	_ = PutHash("user-1", &p1)
@@ -52,9 +72,8 @@ func TestRedis(t *testing.T) {
 func TestReflect(t *testing.T) {
 	// 创建结构体实例
 	person := Person{
-		Name:    "John",
-		Age:     21,
-		Country: "USA",
+		Name: "John",
+		Age:  21,
 	}
 
 	// 将结构体转换为map[string]interface{}
@@ -72,11 +91,4 @@ func TestReflect(t *testing.T) {
 	p := Person{}
 	mapToStruct(&p, newPersonMap)
 	fmt.Println(p)
-}
-
-func TestRedisKey(t *testing.T) {
-	err := GetHash("kk", &Person{})
-	if err != nil {
-		fmt.Println(err)
-	}
 }
