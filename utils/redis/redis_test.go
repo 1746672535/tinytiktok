@@ -40,6 +40,24 @@ func TestSetAndGet(t *testing.T) {
 	fmt.Println(p.Address.Provinces)
 }
 
+func TestSetAddAndGet(t *testing.T) {
+	// 存储数据
+	data := []any{"alice", 18, true}
+	_ = SAdd("test", data)
+	// 读取数据
+	data2, _ := SGet("test")
+	fmt.Println(data2)
+}
+
+func TestZSetAddAndGet(t *testing.T) {
+	// 存储数据 - 请在存储数据之前排序
+	data := []any{"alice", 18, true}
+	_ = ZAdd("z_test", data)
+	// 读取数据
+	data2, _ := ZGet("z_test")
+	fmt.Println(data2)
+}
+
 func TestHashSetAndGet(t *testing.T) {
 	p1 := Person{
 		Name:  "Alice",

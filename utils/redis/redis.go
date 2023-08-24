@@ -80,6 +80,34 @@ func Exists(key string) (bool, error) {
 	return false, err
 }
 
+// SAdd 存储集合
+func SAdd(key string, data []any) error {
+	return Client.SAdd(key, data...).Err()
+}
+
+// SGet 读取集合
+func SGet(key string) ([]string, error) {
+	return Client.SMembers(key).Result()
+}
+
+// ZAdd 添加有序集合 - 请在传递数据之前排序
+func ZAdd(key string, data []any) error {
+	var zData []redis.Z
+	for i, d := range data {
+		zData = append(zData, redis.Z{
+			Score:  float64(2 * i),
+			Member: d,
+		})
+	}
+	// 使用ZAdd方法将ZSET数据存储到Redis中
+	return Client.ZAdd(key, zData...).Err()
+}
+
+// ZGet 读取有序集合
+func ZGet(key string) ([]string, error) {
+	return Client.ZRange(key, 0, -1).Result()
+}
+
 // HSet 设置key中某一个字段的值
 func HSet(key, filed string, value any) error {
 	return Client.HSet(key, filed, value).Err()
