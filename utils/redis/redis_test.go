@@ -64,6 +64,14 @@ func TestZSetAddAndGet(t *testing.T) {
 	fmt.Println(data3)
 }
 
+func TestListSetAndGet(t *testing.T) {
+	data := []any{"alice", 18, true}
+	_ = LPush("list_test", data)
+	// 获取数据
+	data2, _ := LGet("list_test")
+	fmt.Println(data2)
+}
+
 func TestHashSetAndGet(t *testing.T) {
 	p1 := Person{
 		Name:  "Alice",
