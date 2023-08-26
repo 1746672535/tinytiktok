@@ -50,3 +50,11 @@ func ZAppend[K int | int64 | float64 | string | bool | any](key string, data []K
 func ZGet(key string) ([]string, error) {
 	return Client.ZRange(key, 0, -1).Result()
 }
+
+// ZRem 删除集合中的元素
+func ZRem[K int | int64 | float64 | string | bool | any](key string, data K) error {
+	if err := Client.ZRem(key, data).Err(); err != nil {
+		return err
+	}
+	return Client.Expire(key, time.Duration(ExpireTime)*time.Second).Err()
+}
