@@ -8,7 +8,7 @@ import (
 // FavoriteAction 关注操作
 func FavoriteAction(db *gorm.DB, userId, toUserId int64, isFavorite bool) error {
 	var relation Relation
-	result := db.Where("userid=? and pid=? ", userId, toUserId).First(&relation)
+	result := db.Where("user_id=? and pid=? ", userId, toUserId).First(&relation)
 	if result.Error != nil {
 		// 查询出错
 		if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
