@@ -42,25 +42,20 @@ func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp 
 	// 发表评论
 	if req.ActionType == 1 {
 
-		c := &models.Comment{
-			UserID:  req.UserId,
-			VideoID: req.VideoId,
-			Content: req.Content,
-		}
-		var CommentID, err = models.CommentVideo(VideoDb, c)
-		// 为视频的评论数量+1
-		err = models.CalcCommentCountByVideoID(VideoDb, req.VideoId, true)
-		if err != nil {
-			rsp.StatusCode = 1
-			rsp.StatusMsg = msg.NotOk
-			return rsp, err
-		}
-		// 查询视频作者信息
-		user, err := models.GetUserInfo(req.UserId)
 		// 获取当前时间
 		currentTime := time.Now()
 		// 将时间格式化为 "MM-DD" 格式
 		currentDate := currentTime.Format("01-02")
+
+		c := &models.Comment{
+			UserID:    req.UserId,
+			VideoID:   req.VideoId,
+			Content:   req.Content,
+			CreatedAt: currentDate,
+		}
+		var CommentID, err = models.CommentVideo(VideoDb, c)
+		// 查询视频作者信息
+		user, err := models.GetUserInfo(req.UserId)
 
 		// 将数据同步至Redis
 		err = redis.ZAdd(redis.Key("video", "comment", req.VideoId), []any{&models.CommentCache{
@@ -68,11 +63,12 @@ func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp 
 			UserID:    req.UserId,
 			VideoID:   req.VideoId,
 			Content:   req.Content,
+			CreatedAt: currentDate,
 			// edit赋值为false, 该值先进入数据库，所以无需修改
 			IsEdit: false,
 		}})
 		//将用户信息也同步到redis
-		err = redis.PutHash(redis.Key("user", user.Id), user)
+		err = redis.Set(redis.Key("user", user.Id), user)
 
 		if err != nil {
 			return rsp, err
@@ -88,13 +84,6 @@ func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp 
 	if req.ActionType == 2 {
 		//在mysql中删除评论
 		err = models.DeleteComment(VideoDb, req.CommentId)
-		// 为视频的评论数量-1
-		err = models.CalcCommentCountByVideoID(VideoDb, req.VideoId, false)
-		if err != nil {
-			rsp.StatusCode = 1
-			rsp.StatusMsg = msg.NotOk
-			return rsp, err
-		}
 		//同步到redis
 		err = redis.ZRem(redis.Key("video", "comment", req.VideoId), &models.CommentCache{
 			CommentID: req.CommentId,
@@ -128,9 +117,10 @@ func (h *Handle) CommentList(ctx context.Context, req *commentList.CommentListRe
 			continue
 		}
 		commentList = append(commentList, &comment.Comment{
-			Id:      c.CommentID,
-			User:    user,
-			Content: c.Content,
+			Id:         c.CommentID,
+			User:       user,
+			Content:    c.Content,
+			CreateDate: c.CreatedAt,
 		})
 	}
 

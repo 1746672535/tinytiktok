@@ -6,10 +6,11 @@ import (
 
 type Comment struct {
 	gorm.Model
-	ID      int64  `gorm:"primaryKey" json:"id"`
-	UserID  int64  `gorm:"column:user_id" json:"user_id"`
-	VideoID int64  `gorm:"column:video_id" json:"video_id"`
-	Content string `gorm:"column:content" json:"content"`
+	ID        int64  `gorm:"primaryKey" json:"id"`
+	UserID    int64  `gorm:"column:user_id" json:"user_id"`
+	VideoID   int64  `gorm:"column:video_id" json:"video_id"`
+	Content   string `gorm:"column:content" json:"content"`
+	CreatedAt string `gorm:"column:created_at" json:"created_at"`
 }
 
 // 评论缓存数据
@@ -18,6 +19,7 @@ type CommentCache struct {
 	UserID    int64
 	VideoID   int64
 	Content   string
+	CreatedAt string
 	IsEdit    bool
 }
 
