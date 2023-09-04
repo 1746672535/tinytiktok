@@ -1,9 +1,27 @@
 import time
+from queue import Queue
+
 import requests
+
 from config import *
 
-def test_relation_friend_list():
+get_friend_list_ti_queue = Queue()
 
+
+def get_friend_list(user_id, token):
+    params = {
+        "token": token,
+        "user_id": user_id,
+    }
+    start_ti = time.time()
+    response = requests.get(relation_friend_list_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        get_friend_list_ti_queue.put(end_ti - start_ti)
+        return response.json()["user_list"]
+
+
+def test_relation_friend_list():
     # 发送 GET 请求
     params = {
         "token": user_token,
@@ -22,7 +40,6 @@ def test_relation_friend_list():
         # 如果 status_code = 0, 则表示该接口没有问题
         if data["status_code"] == 0:
             print("true")
-
         return end_time - start_time
     else:
         print("请求失败")

@@ -1,9 +1,26 @@
 import time
+from queue import Queue
+
 import requests
+
 from config import *
 
-def test_pub_list():
+get_publish_list_ti_queue = Queue()
 
+
+def get_publish_list(user_id, token):
+    params = {
+        "token": token,
+        "user_id": user_id,
+    }
+    start_ti = time.time()
+    response = requests.get(pub_list_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        get_publish_list_ti_queue.put(end_ti - start_ti)
+
+
+def test_pub_list():
     # 发送 GET 请求
     params = {
         "token": user_token,
@@ -23,7 +40,7 @@ def test_pub_list():
         if data["status_code"] == 0:
             print("true")
         # 用户令牌在某些服务中是必须的, 请在config.py下手动修改token的值
-        #print(data["token"])
+        # print(data["token"])
         return end_time - start_time
     else:
         print("请求失败")

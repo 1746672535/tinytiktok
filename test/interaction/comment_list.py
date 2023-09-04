@@ -1,10 +1,26 @@
 import time
+from queue import Queue
+
 import requests
-from test_publish import *
+
 from config import *
 
-def test_comment_list():
+get_comment_list_ti_queue = Queue()
 
+
+def get_comment_list(video_id, token):
+    params = {
+        "token": token,
+        "video_id": video_id,
+    }
+    start_ti = time.time()
+    response = requests.get(comment_list_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        get_comment_list_ti_queue.put(end_ti - start_ti)
+
+
+def test_comment_list():
     # 发送 GET 请求
     params = {
         "token": user_token,

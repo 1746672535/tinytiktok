@@ -1,13 +1,34 @@
 import time
-from test_publish import *
+from queue import Queue
+
 import requests
+
+from basis.test_publish import *
 from config import *
 
-# 测试登录功能
+publish_video_ti_queue = Queue()
+
+
+def publish_video(token):
+    files = {
+        'data': ('test_video', test_video, 'application/octet-stream')
+    }
+    payloads = {
+        "token": token,
+        "title": fake.text(max_nb_chars=16),
+    }
+    start_ti = time.time()
+    response = requests.post(pub_action_url, data=payloads, files=files)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        publish_video_ti_queue.put(end_ti - start_ti)
+        print(f"用户发布视频成功")
+
+
 def test_pub_action():
     # 请求参数
     files = {
-        'data': ('test_video', test_video,'application/octet-stream')
+        'data': ('test_video', test_video, 'application/octet-stream')
     }
     payloads = {
         "token": user_token,
@@ -34,7 +55,5 @@ def test_pub_action():
         return -10086
 
 
-
 if __name__ == '__main__':
-    # 测试登录
     test_pub_action()

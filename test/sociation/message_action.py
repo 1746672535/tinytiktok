@@ -1,24 +1,36 @@
 import time
+from queue import Queue
+
 import requests
+
 from config import *
 
+send_message_ti_queue = Queue()
 
-# 测试登录功能
+
+def send_message(friend_id, token):
+    params = {
+        "token": token,
+        "to_user_id": friend_id,
+        "action_type": "1",
+        "content": fake.text(max_nb_chars=40),
+    }
+    start_ti = time.time()
+    response = requests.post(message_action_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        send_message_ti_queue.put(end_ti - start_ti)
+        print(f"用户向好友发送信息成功")
+
+
 def test_message_action():
-    # is_con=1时，进行评论操作，is_con=2时...
-    is_con = int(input())
-    params = {}
-    if is_con == 1:
-        params = {
-            "token": user_token,
-            "to_user_id": to_user_id,
-            "action_type": "1",
-            "content": test_content,
-        }
-        print(test_content)
-
-    #if is_con == 2:
-
+    params = {
+        "token": user_token,
+        "to_user_id": to_user_id,
+        "action_type": "1",
+        "content": test_content,
+    }
+    print(test_content)
 
     # 发送 POST 请求
     start_time = time.time()
@@ -38,7 +50,6 @@ def test_message_action():
     else:
         print("请求失败")
         return -10086
-
 
 
 if __name__ == '__main__':

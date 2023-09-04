@@ -1,11 +1,31 @@
 import time
+from queue import Queue
 
 import requests
 
 from config import *
 
+register_ti_queue = Queue()
 
-# 测试注册功能
+
+def register(test_prefix, test_id):
+    username = f"{test_prefix}-{test_id}"
+    password = "123456"
+    params = {
+        "username": username,
+        "password": password,
+    }
+    start_ti = time.time()
+    response = requests.post(register_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        register_ti_queue.put(end_ti - start_ti)
+        user_id = response.json()["user_id"]
+        token = response.json()["token"]
+        print(f"用户注册成功: {username} {password}")
+        return username, password, user_id, token
+
+
 def test_register():
     # 请求参数
     params = {
@@ -38,4 +58,5 @@ def test_register():
 
 
 if __name__ == '__main__':
-    test_register()
+    print(register())
+    # test_register()

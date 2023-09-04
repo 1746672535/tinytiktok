@@ -1,13 +1,29 @@
 import time
+from queue import Queue
+
 import requests
+
 from config import *
-from test_publish import *
+
+comment_video_ti_queue = Queue()
 
 
-# 测试登录功能
-def test_comment_action():
-    # is_com=1时，进行评论操作，is_com=2时，进行取消评论操作
-    is_com = int(input())
+def comment_video(video_id, token):
+    comment = fake.text(max_nb_chars=50)
+    params = {
+        "token": token,
+        "video_id": video_id,
+        "action_type": "1",
+        "comment_text": comment,
+    }
+    start_ti = time.time()
+    response = requests.post(comment_action_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        comment_video_ti_queue.put(end_ti - start_ti)
+
+
+def test_comment_action(is_com=1):
     params = {}
     if is_com == 1:
         params = {
@@ -18,12 +34,12 @@ def test_comment_action():
         }
         print(test_comment)
 
-    if is_com == 2:
+    if is_com == 0:
         params = {
             "token": user_token,
             "video_id": video_id,
             "action_type": "2",
-            "comment_id": comment_id,    #根据评论ID可修改
+            "comment_id": comment_id,  # 根据评论ID可修改
         }
 
     # 发送 POST 请求
@@ -44,7 +60,6 @@ def test_comment_action():
     else:
         print("请求失败")
         return -10086
-
 
 
 if __name__ == '__main__':

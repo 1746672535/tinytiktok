@@ -1,11 +1,28 @@
 import time
+from queue import Queue
 
 import requests
 
 from config import *
 
+login_ti_queue = Queue()
 
-# 测试登录功能
+
+def login(username, password):
+    # 请求参数
+    params = {
+        "username": username,
+        "password": password,
+    }
+    start_ti = time.time()
+    response = requests.post(login_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        login_ti_queue.put(end_ti - start_ti)
+        print(f"{username} 用户登录成功")
+        return response.json()["user_id"], response.json()["token"]
+
+
 def test_login():
     # 请求参数
     params = {

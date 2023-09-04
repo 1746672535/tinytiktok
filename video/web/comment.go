@@ -15,7 +15,6 @@ import (
 
 func Comment(ctx *gin.Context) {
 	// 鉴权
-
 	if !ctx.GetBool("auth") {
 		common.ReturnErr(ctx, msg.AuthError)
 		return

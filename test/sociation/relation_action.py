@@ -1,23 +1,38 @@
 import time
+from queue import Queue
+
 import requests
-from test_publish import *
+
 from config import *
 
+concern_user_ti_queue = Queue()
 
-# 测试登录功能
-def test_relation_action():
-    # is_relation=1时，进行关注操作，is_relation=2时，进行取消关注操作
-    is_relation = int(input())
+
+def concern_user(concern_user_id, token):
+    params = {
+        "token": token,
+        "to_user_id": concern_user_id,
+        "action_type": "1",
+    }
+    start_ti = time.time()
+    response = requests.post(relation_action_url, params=params)
+    end_ti = time.time()
+    if response.json()["status_code"] == 0:
+        concern_user_ti_queue.put(end_ti - start_ti)
+        print(f"用户关注作者成功")
+
+
+def test_relation_action(is_relation=1):
     if is_relation == 1:
         params = {
             "token": user_token,
-            "to_user_id": video_id,
+            "to_user_id": to_user_id,
             "action_type": "1",
         }
-    if is_relation == 2:
+    if is_relation == 0:
         params = {
             "token": user_token,
-            "to_user_id": video_id,
+            "to_user_id": to_user_id,
             "action_type": "2",
         }
 
@@ -38,7 +53,6 @@ def test_relation_action():
     else:
         print("请求失败")
         return -10086
-
 
 
 if __name__ == '__main__':
