@@ -148,7 +148,7 @@ func GetVideoLikesCount(db *gorm.DB, videoID int64) (int64, error) {
 // IsFavorite 查询该用户是否被作者关注
 func IsFavorite(db *gorm.DB, userId, authorId int64) bool {
 	var user models.Relation
-	result := db.Where("userid=? and pid=? and state =1 ", userId, authorId).First(&user)
+	result := db.Where("user_id=? and pid=? and state =1 ", userId, authorId).First(&user)
 	if result.Error != nil {
 		return false
 	}
