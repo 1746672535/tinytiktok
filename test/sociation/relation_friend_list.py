@@ -1,9 +1,6 @@
+import requests
 import time
 from queue import Queue
-
-import requests
-
-from config import *
 
 get_friend_list_ti_queue = Queue()
 

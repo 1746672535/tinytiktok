@@ -13,6 +13,7 @@ bin-release/
 *.air
 *.ipa
 *.apk
+*.pyc
 *.lnk
 config/config.yaml
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
@@ -23,3 +24,5 @@ config/config.yaml
 .idea/modules.xml
 /config/
 /.idea/
+/test/.idea/
+/test/__pycache__/

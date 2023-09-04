@@ -1,9 +1,6 @@
+import requests
 import time
 from queue import Queue
-
-import requests
-
-from config import *
 
 send_message_ti_queue = Queue()
 

@@ -11,8 +11,8 @@ import (
 	"tinytiktok/video/proto/commentList"
 )
 
-//// 将评论数据flush到数据库
-//func FlushCommentDataToMysql() {
+// // 将评论数据flush到数据库
+// func FlushCommentDataToMysql() {
 //	client := redis.Client
 //	// 获取所有键
 //	keys, err := client.Keys("*").Result()
@@ -35,7 +35,7 @@ import (
 //			_ = redis.HSet(key, "IsEdit", false)
 //		}
 //	}
-//}
+// }
 
 func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp *comment.CommentResponse, err error) {
 	rsp = &comment.CommentResponse{}
@@ -67,7 +67,7 @@ func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp 
 			// edit赋值为false, 该值先进入数据库，所以无需修改
 			IsEdit: false,
 		}})
-		//将用户信息也同步到redis
+		// 将用户信息也同步到redis
 		err = redis.Set(redis.Key("user", user.Id), user)
 
 		if err != nil {
@@ -82,9 +82,9 @@ func (h *Handle) Comment(ctx context.Context, req *comment.CommentRequest) (rsp 
 	}
 	// 删除评论
 	if req.ActionType == 2 {
-		//在mysql中删除评论
+		// 在mysql中删除评论
 		err = models.DeleteComment(VideoDb, req.CommentId)
-		//同步到redis
+		// 同步到redis
 		err = redis.ZRem(redis.Key("video", "comment", req.VideoId), &models.CommentCache{
 			CommentID: req.CommentId,
 			UserID:    req.UserId,
@@ -124,17 +124,17 @@ func (h *Handle) CommentList(ctx context.Context, req *commentList.CommentListRe
 		})
 	}
 
-	//// 获取所有的comments
-	//comments, err := models.GetCommentListByVideoID(VideoDb, req.VideoId)
-	//if err != nil {
+	// // 获取所有的comments
+	// comments, err := models.GetCommentListByVideoID(VideoDb, req.VideoId)
+	// if err != nil {
 	//	rsp.StatusCode = 1
 	//	rsp.StatusMsg = msg.NotOk
 	//	return rsp, err
-	//}
+	// }
 	//
-	//// 整理返回
-	//var commentList []*comment.Comment
-	//for _, c := range comments {
+	// // 整理返回
+	// var commentList []*comment.Comment
+	// for _, c := range comments {
 	//	// 查询视频作者信息
 	//	user, err := models.GetUserInfo(c.UserID)
 	//	if err != nil {
@@ -145,7 +145,7 @@ func (h *Handle) CommentList(ctx context.Context, req *commentList.CommentListRe
 	//		User:    user,
 	//		Content: c.Content,
 	//	})
-	//}
+	// }
 
 	// 返回结果
 	rsp.StatusCode = msg.Success

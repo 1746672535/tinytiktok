@@ -1,9 +1,6 @@
+import requests
 import time
 from queue import Queue
-
-import requests
-
-from config import *
 
 get_feed_ti_queue = Queue()
 

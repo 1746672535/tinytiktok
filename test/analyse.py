@@ -1,8 +1,7 @@
 import os
 import shelve
-from queue import Queue
-
 from matplotlib import pyplot as plt
+from queue import Queue
 
 plt.rcParams["font.sans-serif"] = ["SimHei"]
 plt.rcParams["axes.unicode_minus"] = False

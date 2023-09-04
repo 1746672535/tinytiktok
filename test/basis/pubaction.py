@@ -1,10 +1,7 @@
-import time
-from queue import Queue
-
 import requests
-
+import time
 from basis.test_publish import *
-from config import *
+from queue import Queue
 
 publish_video_ti_queue = Queue()
 

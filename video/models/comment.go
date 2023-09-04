@@ -53,11 +53,11 @@ func CommentVideo(db *gorm.DB, comment *Comment) (int64, error) {
 	if result.Error != nil {
 		return -1, result.Error
 	}
-	//将评论数量+1
+	// 将评论数量+1
 	err := CalcCommentCountByVideoID(db, comment.VideoID, true)
 	if err != nil {
 		db.Rollback()
-		return -1, err //这里到底要返回什么
+		return -1, err // 这里到底要返回什么
 	}
 	var CommentId int64
 	db.Raw("select LAST_INSERT_ID() as id").Pluck("id", &CommentId)
@@ -91,7 +91,7 @@ func DeleteComment(db *gorm.DB, commentID int64) error {
 	comment := Comment{}
 	db.Where("id = ?", commentID).Take(&comment)
 	result := db.Delete(&comment)
-	//将评论数量-1
+	// 将评论数量-1
 	err := CalcFavoriteCountByVideoID(db, comment.VideoID, false)
 	if err != nil {
 		db.Rollback()
